@@ -30,40 +30,70 @@ library(car)
 library(MASS)
 ```
 ```{r}
-ecars = read.csv('EV_cars.csv')
+ecars_raw = read.csv('EV_cars.csv')
 ```
 
 
 ```{r}
-ecars$battery = ecars$Battery
-ecars = ecars[,2:10]
+ecars_raw$battery = ecars_raw$Battery
+ecars_raw = ecars_raw[,2:10]
 ```
 
 ```{r}
-make = strsplit(ecars$Car_name, split = ' ')
+make = strsplit(ecars_raw$Car_name, split = ' ')
 make_ = c()
 n = length(make)
 n = c(1:n)
 for (i in n) {
   make_[i] = make[[i]][1]
 }
-ecars$Make = make_
-ecars
+ecars_raw$Make = make_
+ecars_raw
+```
+```{r}
+
+ecars = ecars_raw %>% filter(!is.na(Price.DE.))
+
+ecars %>% group_by(Make) %>%
+  filter(n() > 5) %>%
+  summarise(average_cost = mean(Price.DE.))
+
+ecars %>% group_by(Make)%>%
+  summarise(average_cost = mean(Price.DE.)) %>%
+  arrange(average_cost) %>%
 ```
 
 ```{r}
 plot(ecars[,3:9])
-```
-
-```{r}
-hist(ecars$Price.DE.)
+plot(ecars$acceleration..0.100., ecars$battery)
+hist(ecars$Fast_charge) 
+hist(ecars$Efficiency)
+ecars$Price_pow = (ecars$Price.DE. ** -.5)
+ecars$Speed_pow = (ecars$Top_speed ** .25)
+ecars$Efficiency_pow = (ecars$Efficiency ** .25)
 summary(ecars)
 sapply(ecars, sd)
-imodel = lm(Price.DE. ~ Range + battery, data = ecars)
-summary(imodel)
-plot(imodel)
 ```
+Colinearity with predicting Range based n battery
 
+```{r}
+
+RBmodel = lm(Range ~  battery, data = ecars)
+summary(RBmodel)
+plot(RBmodel) 
+
+ATmodel = lm(Top_speed ~ acceleration..0.100., data = ecars)
+summary(ATmodel)
+plot(ATmodel)
+
+model = lm(Price_pow ~ Efficiency_pow + Speed_pow + Fast_charge + Range, data = ecars)
+summary(model) 
+
+```
+With transformation done to price 
+```{r}
+
+```
 
 
 
