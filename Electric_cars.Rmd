@@ -22,20 +22,34 @@ Data Fields:
 - Top_speed:The maximum speed the vehicle can achieve in kilometers per hour.
 
 - Acceleration..0.100.: The acceleration time from 0 to 100 kilometers per hour.
-
+```{r}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(car)
+library(MASS)
+```
 ```{r}
 ecars = read.csv('EV_cars.csv')
-
 ```
 
 
 ```{r}
-colnames(ecars)
 ecars$battery = ecars$Battery
 ecars = ecars[,2:10]
-ecars
 ```
 
+```{r}
+make = strsplit(ecars$Car_name, split = ' ')
+make_ = c()
+n = length(make)
+n = c(1:n)
+for (i in n) {
+  make_[i] = make[[i]][1]
+}
+ecars$Make = make_
+ecars
+```
 
 ```{r}
 plot(ecars[,3:9])
