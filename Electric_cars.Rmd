@@ -1,0 +1,94 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+About this file
+Data Fields:
+
+- Battery: The capacity of the vehicle's battery in kilowatt-hours (kWh).
+
+- Car_name: The model name of the electric vehicle.
+
+- Car_name_link: A direct link to the corresponding page on EV Database for more in-depth information.
+
+- Efficiency: The energy efficiency rating of the vehicle in watt-hours per kilometer (Wh/km).
+
+- Fast_charge: The fast-charging capability of the vehicle in minutes for a certain charging percentage.
+
+- Price.DE.:The price of the electric vehicle in Germany.
+
+- Range: The driving range of the vehicle on a single charge in kilometers.
+
+- Top_speed:The maximum speed the vehicle can achieve in kilometers per hour.
+
+- Acceleration..0.100.: The acceleration time from 0 to 100 kilometers per hour.
+
+```{r}
+ecars = read.csv('EV_cars.csv')
+
+```
+
+
+```{r}
+colnames(ecars)
+ecars$battery = ecars$Battery
+ecars = ecars[,2:10]
+ecars
+```
+
+
+```{r}
+plot(ecars[,3:9])
+```
+
+```{r}
+hist(ecars$Price.DE.)
+summary(ecars)
+sapply(ecars, sd)
+imodel = lm(Price.DE. ~ Range + battery, data = ecars)
+summary(imodel)
+plot(imodel)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
