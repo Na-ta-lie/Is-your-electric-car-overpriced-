@@ -142,17 +142,33 @@ ecars_missing_price
 ```
 ```{r}
 test2 = predict(model, ecars, interval = 'prediction')
+test3 = predict(model, ecars, interval = 'confidence')
 test2_2_dollars = (1/(test2))^2
-new = data.frame(Name = ecars$Car_name,
+test3_2_dollars = (1/(test3))^2
+test2_2_dollars
+test3_2_dollars
+test2_2_dollarsnew = data.frame(Name = ecars$Car_name,
                  Make = ecars$Make,
                  Price = ecars$Price, 
-                 Predicted_price = (test2_2_dollars[,1]))
-new
+                 Predicted_price = (test2_2_dollars[,1]),
+                 Predicted_price_lwr = (test2_2_dollars[,2]),
+                 Predicted_price_upr = (test2_2_dollars[,3]),
+                 Confidence_price_lwr = (test3_2_dollars[,2]),
+                 Confidence_price_upr = (test3_2_dollars[,3]))
+test2_2_dollarsnew
 ```
+
+
 ```{r}
-ggplot(data = new, aes(x = Predicted_price, y = Price)) +
+ggplot(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Price)) +
   geom_point(aes(color = Make)) +
-  geom_abline(intercept = 0, slope = 1)
+  geom_line(aes(x = Predicted_price, y = Predicted_price)) +
+  geom_line(aes(x = Predicted_price, y = Predicted_price_lwr), col = 'red') +
+  geom_line(aes(x = Predicted_price, y = Predicted_price_upr)) +
+  geom_line(aes(x = Predicted_price, y = Confidence_price_lwr)) +
+  geom_line(aes(x = Predicted_price, y = Confidence_price_upr))
+  
+  
 new
 ```
 
@@ -174,29 +190,46 @@ new %>% group_by(Make) %>%
   summarise(average_price = (mean(Price)/1000), average_predicted_price = (mean(Predicted_price)/1000))%>%
   ggplot(., aes(x = average_predicted_price, y = average_price)) +
   geom_point(aes(color = Make), size =4) +
-  geom_abline(intercept = 0, slope = 1)
+  geom_abline(intercept = 0, slope = 1) + 
+  
 ```
 
 
 
 ```{r}
+new
 new %>% group_by(Make) %>%
   filter(n() >= 10) %>%
   summarise(average_price = (mean(Price)/1000), average_predicted_price = (mean(Predicted_price)/1000))%>%
   ggplot(., aes(x = average_predicted_price, y = average_price)) +
   geom_point(aes(color = Make), size =4) +
-  abline(model, lty = 2)
+  geom_line(aes(x = average_predicted_price, y = average_predicted_price)) + 
+
+
 ```
 
 ```{r}
-conf.band = predict(model, newdata, interval = 'confidence')
-pred.band = predict(model, newdata, interval = 'prediction')
+predict(model, newdata, interval = 'confidence')
+predict(model, newdata, interval = 'prediction')
 ```
 
 
+```{r}
+new
+new %>% group_by(Make) %>%
+  filter(n() >= 10) %>%
+  summarise(average_price = (mean(Price)/1000), average_predicted_price = (mean(Predicted_price)/1000))
+```
+
+```{r}
+ecars_missing_price
+pre
+```
 
 
-
+```{r}
+model
+```
 
 
 
