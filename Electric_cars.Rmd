@@ -67,13 +67,27 @@ ecars_missing_price = ecars_raw %>% filter(is.na(Price))
 
 ```{r}
 ecars %>% group_by(Make) %>%
-  filter(n() > 5) %>%
-  summarise(average_cost = mean(Price.DE.))
+  filter(n() >= 10) %>%
+  summarise(average_cost = mean(Price))
 
-ecars %>% group_by(Make)%>%
-  summarise(average_cost = mean(Price.DE.)) %>%
-  arrange(average_cost) %>%
+ecars %>% group_by(Make) %>%
+  filter(n() >= 10) %>%
+  summarise(average_cost = (mean(Price)/1000)) %>%
+  ggplot(., aes(x = Make, y = average_cost)) +
+  geom_col(aes(fill = Make)) + 
+  ylab('Average cost in Germany in thousands of Eruros')+
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+  
+
+#ecars %>% group_by(Make)%>%
+ # summarise(average_cost = mean(Price)) %>%
+  #arrange(average_cost)
 ```
+
+
+
 ```{r}
 unique(ecars$Make)
 ecars %>% filter(Make == "e.Go")
@@ -82,43 +96,102 @@ ecars %>% filter(Make == "e.Go")
 
 ```{r}
 plot(ecars[,3:9])
-plot(ecars$acceleration..0.100., ecars$battery)
-hist(ecars$Price_pow) 
-hist(ecars$Efficiency)
-ecars$Price_pow = (ecars$Price.DE. ** -.5)
+plot(ecars$Acceleration, ecars$Battery)
+
+ecars$Price_pow = (ecars$Price ** -.5)
 ecars$Speed_pow = (ecars$Top_speed ** .25)
 ecars$Efficiency_pow = (ecars$Efficiency ** .25)
 summary(ecars)
 sapply(ecars, sd)
+hist(ecars$Price) 
+hist(ecars$Price_pow) 
+hist(ecars$Efficiency)
+ecars
 ```
 Colinearity with predicting Range based n battery
 
 ```{r}
 
-RBmodel = lm(Range ~  battery, data = ecars)
+RBmodel = lm(Range ~  Battery, data = ecars)
 summary(RBmodel)
 plot(RBmodel) 
 
-ATmodel = lm(Top_speed ~ acceleration..0.100., data = ecars)
+PBmodel = lm(Price ~  Battery, data = ecars)
+summary(PBmodel)
+plot(PBmodel) 
+
+ATmodel = lm(Top_speed ~ Acceleration, data = ecars)
 summary(ATmodel)
 plot(ATmodel)
 
-model = lm(Price_pow ~ Efficiency_pow + Speed_pow + Fast_charge + Range, data = ecars)
+model = lm(Price_pow ~ Efficiency_pow + Range + Speed_pow + Fast_charge, data = ecars)
 summary(model) 
+plot(model)
 
 ```
 With transformation done to price 
 ```{r}
+ecars_missing_price$Speed_pow = (ecars_missing_price$Top_speed ** .25)
+ecars_missing_price$Efficiency_pow = (ecars_missing_price$Efficiency ** .25)
+test = predict(model, ecars_missing_price, interval = 'prediction')
+test_2_dollars = (1/(test))^2
+ecars_missing_price
+test_2_dollars
+ecars_missing_price$predicted_price = (test_2_dollars[,1])
+ecars_missing_price
+```
+```{r}
+test2 = predict(model, ecars, interval = 'prediction')
+test2_2_dollars = (1/(test2))^2
+new = data.frame(Name = ecars$Car_name,
+                 Make = ecars$Make,
+                 Price = ecars$Price, 
+                 Predicted_price = (test2_2_dollars[,1]))
+new
+```
+```{r}
+ggplot(data = new, aes(x = Predicted_price, y = Price)) +
+  geom_point(aes(color = Make)) +
+  geom_abline(intercept = 0, slope = 1)
+new
+```
 
+
+```{r}
+new %>% group_by(Make) %>%
+  filter(n() >= 10) %>%
+  summarise(average_cost = (mean(Price)/1000), average_predicted_cost = (mean(Predicted_price)/1000)) #%>%
+  #ggplot(., aes(x = Make, y = average_predicted_cost)) +
+  #geom_col(aes(fill = Make)) + 
+  #ylab('Average cost in Germany in thousands of Eruros')+
+  #theme(axis.title.x=element_blank(),
+   #     axis.text.x=element_blank(),
+    #    axis.ticks.x=element_blank())
+```
+```{r}
+new %>% group_by(Make) %>%
+  filter(n() >= 10) %>%
+  summarise(average_price = (mean(Price)/1000), average_predicted_price = (mean(Predicted_price)/1000))%>%
+  ggplot(., aes(x = average_predicted_price, y = average_price)) +
+  geom_point(aes(color = Make), size =4) +
+  geom_abline(intercept = 0, slope = 1)
 ```
 
 
 
+```{r}
+new %>% group_by(Make) %>%
+  filter(n() >= 10) %>%
+  summarise(average_price = (mean(Price)/1000), average_predicted_price = (mean(Predicted_price)/1000))%>%
+  ggplot(., aes(x = average_predicted_price, y = average_price)) +
+  geom_point(aes(color = Make), size =4) +
+  abline(model, lty = 2)
+```
 
-
-
-
-
+```{r}
+conf.band = predict(model, newdata, interval = 'confidence')
+pred.band = predict(model, newdata, interval = 'prediction')
+```
 
 
 
@@ -143,10 +216,6 @@ With transformation done to price
 This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
 
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
-
-```{r}
-plot(cars)
-```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
