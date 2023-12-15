@@ -28,6 +28,8 @@ library(ggplot2)
 library(tidyr)
 library(car)
 library(MASS)
+install.packages('repr')
+library(repr)
 ```
 ```{r}
 ecars_raw = read.csv('EV_cars.csv')
@@ -149,31 +151,61 @@ test2_2_dollars
 test3_2_dollars
 test2_2_dollarsnew = data.frame(Name = ecars$Car_name,
                  Make = ecars$Make,
-                 Price = ecars$Price, 
-                 Predicted_price = (test2_2_dollars[,1]),
-                 Predicted_price_lwr = (test2_2_dollars[,2]),
-                 Predicted_price_upr = (test2_2_dollars[,3]),
-                 Confidence_price_lwr = (test3_2_dollars[,2]),
-                 Confidence_price_upr = (test3_2_dollars[,3]))
+                 Price = ecars$Price/1000, 
+                 Predicted_price = (test2_2_dollars[,1]/1000),
+                 Predicted_price_lwr = (test2_2_dollars[,2]/1000),
+                 Predicted_price_upr = (test2_2_dollars[,3]/1000),
+                 Confidence_price_lwr = (test3_2_dollars[,2]/1000),
+                 Confidence_price_upr = (test3_2_dollars[,3])/1000)
 test2_2_dollarsnew
+```
+```{r}
+# cars groups by brands with the most models
+
+most_makes = test2_2_dollarsnew %>% group_by(Make) %>%
+  filter(n() >= 10) %>%
+  summarise(average_cost = (mean(Price)), average_predicted_cost = (mean(Predicted_price)))
+```
+
+```{r}
+
+
+gplt1 = ggplot(NULL, aes(Predicted_price, Price)) + 
+      geom_point(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Price)) +
+      geom_point(data = most_makes, aes(x = average_predicted_cost, y = average_cost, color = Make, size = 3)) +
+      geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Predicted_price_lwr), col = 'red') +
+      geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Predicted_price_upr), col = 'red') +
+      geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Confidence_price_lwr), col = 'blue') +
+      geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Confidence_price_upr), col = 'blue') +
+      ylim(0,250)
+
+gplt1
+
+ggsave('gplt1.png', width = 15)
+         
 ```
 
 
 ```{r}
+options(repr.plot.width = 15, repr.plot.height =2) 
+
 ggplot(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Price)) +
-  geom_point(aes(color = Make)) +
+  geom_point() +
   geom_line(aes(x = Predicted_price, y = Predicted_price)) +
   geom_line(aes(x = Predicted_price, y = Predicted_price_lwr), col = 'red') +
   geom_line(aes(x = Predicted_price, y = Predicted_price_upr)) +
   geom_line(aes(x = Predicted_price, y = Confidence_price_lwr)) +
-  geom_line(aes(x = Predicted_price, y = Confidence_price_upr))
-  
+  geom_line(aes(x = Predicted_price, y = Confidence_price_upr)) #+
+ geom_point(aes(x = most_makes$average_cost, y =most_makes$average_predicted_cost))
+
+
   
 new
 ```
 
 
 ```{r}
+new
 new %>% group_by(Make) %>%
   filter(n() >= 10) %>%
   summarise(average_cost = (mean(Price)/1000), average_predicted_cost = (mean(Predicted_price)/1000)) #%>%
@@ -187,10 +219,9 @@ new %>% group_by(Make) %>%
 ```{r}
 new %>% group_by(Make) %>%
   filter(n() >= 10) %>%
-  summarise(average_price = (mean(Price)/1000), average_predicted_price = (mean(Predicted_price)/1000))%>%
+  summarise(average_price = (mean(Price)/1000), average_predicted_price =  (mean(Predicted_price)/1000))%>%
   ggplot(., aes(x = average_predicted_price, y = average_price)) +
-  geom_point(aes(color = Make), size =4) +
-  geom_abline(intercept = 0, slope = 1) + 
+  geom_point(aes(color = Make), size =4) 
   
 ```
 
@@ -230,7 +261,15 @@ pre
 ```{r}
 model
 ```
+```{r}
+ecars
+```
 
+
+```{r}
+model.empty = lm(Price_pow ~ 1, data = ecars)
+model.full = lm(Price_pow ~ Efficiency_pow + Range + Battery + Speed_pow + Fast_charge + Acceleration, data = ecars)
+```
 
 
 
