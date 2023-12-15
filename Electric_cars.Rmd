@@ -28,8 +28,8 @@ library(ggplot2)
 library(tidyr)
 library(car)
 library(MASS)
-install.packages('repr')
 library(repr)
+install.packages('broom')
 ```
 
 
@@ -66,18 +66,17 @@ ecars_raw = ecars_raw %>% relocate(Battery, .after = Car_name_link)
 ecars_raw
 ```
 ```{r}
+ecars_raw = ecars_raw %>% filter(!is.na(Fast_charge))
 ecars = ecars_raw %>% filter(!is.na(Price))
 ecars_missing_price = ecars_raw %>% filter(is.na(Price))
 ```
 
-```{r}
-ecars_raw %>% filter (is.na(Fast_charge))
-```
+This data required minimal processing. I created a Make variable by extracting the first word from the Car_name variable. I also renamed several columns to make them more intuitive for example acceleration..0.100. to Acceleration. I removed the two cars that did not have Fast Charge (the Renault Twingo Electric and the e.Go e.wave X) capability because this was an important feature in the linear regression and was impacting their price. Finally I made sure all the continuous variables were next to each other to simplify calling them. I split the dataframe into two. One with prices(307 objects) and one with missing prices (51 objects). 
 
-This data required minimal processing. I created a Make variable by extracting the first word from the Car_name variable. I also renamed several columns to make them more intuitive for example acceleration..0.100. to Acceleration. Finally I made sure all the continuous variables were next to each other to simplify calling them. Finally I split the dataframe into two. One with prices(309 objects) and one with missing prices (51 objects). 
+After cleaning the data 45 unique car makes were included in the ecars data used to create the linear model and 22 unique car makes were included in the data with missing prices. Additionally 14 makes that have 10 or more car models are highlighted throughout the project.  
 
 ```{r}
-length(ecars_missing_price$Price)
+length(ecars$Price)
 ```
 
 ```{r}
@@ -105,7 +104,10 @@ ecars %>% group_by(Make) %>%
 
 ```{r}
 unique(ecars$Make)
-ecars %>% filter(Make == "e.Go")
+unique(ecars_missing_price$Make)
+
+length(unique(ecars$Make))
+length(unique(ecars_missing_price$Make))
 
 ```
 
@@ -121,6 +123,7 @@ sapply(ecars, sd)
 hist(ecars$Price) 
 hist(ecars$Price_pow) 
 hist(ecars$Efficiency)
+hist(ecars$Price)
 ecars
 ```
 Colinearity with predicting Range based n battery
@@ -296,19 +299,34 @@ battery speed_pow efficiency and fast charge
 model.empty2 = lm(Price ~ 1, data = ecars)
 model.full2 = lm(Price ~ Efficiency + Range + Battery + Top_speed + Fast_charge + Acceleration, data = ecars)
 scope2 = list(lower = formula(model.empty2), upper = formula(model.full2))
-scope
-forwardAIC2 = step(model.empty2, scope, direction = 'forward', k = 2)
+scope2
+forwardAIC2 = step(model.empty2, scope2, direction = 'forward', k = 2)
 ```
 
 
 ```{r}
 model.empty3 = lm(Price_pow ~ 1, data = ecars)
 model.full3 = lm(Price_pow ~ Efficiency + Range + Battery + Top_speed + Fast_charge + Acceleration, data = ecars)
-scope3 = list(lower = formula(model.empty), upper = formula(model.full))
+scope3 = list(lower = formula(model.empty3), upper = formula(model.full3))
+forwardAIC3 = step(model.empty3, scope3, direction = 'forward', k = 2)
+```
+I'm getting a lower AIC when I run these without transforming them??? I need to transform price but not the others?? not sure what to do?? 
+
+```{r}
+model.empty = lm(Price_pow ~ 1, data = ecars)
+model.full = lm(Price_pow ~ Efficiency_pow + Range + Battery + Speed_pow + Fast_charge + Acceleration, data = ecars)
+scope = list(lower = formula(model.empty), upper = formula(model.full))
 scope
-forwardAIC3 = step(model.empty, scope, direction = 'forward', k = 2)
+forwardAIC = step(model.empty, scope, direction = 'forward', k = 2)
 ```
 
+```{r}
+broom::glance(model)
+broom::glance(model.full)
+model_best = lm(Price_pow ~ Efficiency_pow + Range + Battery + Speed_pow + Fast_charge, data = ecars)
+broom::glance(model.full3)
+broom::glance(model_best)
+```
 
 
 
