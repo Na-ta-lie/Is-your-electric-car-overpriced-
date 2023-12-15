@@ -31,9 +31,12 @@ library(MASS)
 install.packages('repr')
 library(repr)
 ```
+
+
 ```{r}
 ecars_raw = read.csv('EV_cars.csv')
 ecars_raw
+
 ```
 
 ```{r}
@@ -65,6 +68,16 @@ ecars_raw
 ```{r}
 ecars = ecars_raw %>% filter(!is.na(Price))
 ecars_missing_price = ecars_raw %>% filter(is.na(Price))
+```
+
+```{r}
+ecars_raw %>% filter (is.na(Fast_charge))
+```
+
+This data required minimal processing. I created a Make variable by extracting the first word from the Car_name variable. I also renamed several columns to make them more intuitive for example acceleration..0.100. to Acceleration. Finally I made sure all the continuous variables were next to each other to simplify calling them. Finally I split the dataframe into two. One with prices(309 objects) and one with missing prices (51 objects). 
+
+```{r}
+length(ecars_missing_price$Price)
 ```
 
 ```{r}
@@ -130,6 +143,8 @@ model = lm(Price_pow ~ Efficiency_pow + Range + Speed_pow + Fast_charge, data = 
 summary(model) 
 plot(model)
 
+#battery speed_pow efficiency and fast charge 
+
 ```
 With transformation done to price 
 ```{r}
@@ -173,6 +188,7 @@ most_makes = test2_2_dollarsnew %>% group_by(Make) %>%
 gplt1 = ggplot(NULL, aes(Predicted_price, Price)) + 
       geom_point(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Price)) +
       geom_point(data = most_makes, aes(x = average_predicted_cost, y = average_cost, color = Make, size = 3)) +
+      geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Predicted_price)) +
       geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Predicted_price_lwr), col = 'red') +
       geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Predicted_price_upr), col = 'red') +
       geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Confidence_price_lwr), col = 'blue') +
@@ -269,12 +285,29 @@ ecars
 ```{r}
 model.empty = lm(Price_pow ~ 1, data = ecars)
 model.full = lm(Price_pow ~ Efficiency_pow + Range + Battery + Speed_pow + Fast_charge + Acceleration, data = ecars)
+scope = list(lower = formula(model.empty), upper = formula(model.full))
+scope
+forwardAIC = step(model.empty, scope, direction = 'forward', k = 2)
+```
+
+battery speed_pow efficiency and fast charge 
+
+```{r}
+model.empty2 = lm(Price ~ 1, data = ecars)
+model.full2 = lm(Price ~ Efficiency + Range + Battery + Top_speed + Fast_charge + Acceleration, data = ecars)
+scope2 = list(lower = formula(model.empty2), upper = formula(model.full2))
+scope
+forwardAIC2 = step(model.empty2, scope, direction = 'forward', k = 2)
 ```
 
 
-
-
-
+```{r}
+model.empty3 = lm(Price_pow ~ 1, data = ecars)
+model.full3 = lm(Price_pow ~ Efficiency + Range + Battery + Top_speed + Fast_charge + Acceleration, data = ecars)
+scope3 = list(lower = formula(model.empty), upper = formula(model.full))
+scope
+forwardAIC3 = step(model.empty, scope, direction = 'forward', k = 2)
+```
 
 
 
