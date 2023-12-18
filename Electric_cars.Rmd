@@ -123,10 +123,17 @@ sapply(ecars, sd)
 hist(ecars$Price) 
 hist(ecars$Price_pow) 
 hist(ecars$Efficiency)
-hist(ecars$Price)
+hist(ecars$Price_pow)
 ecars
 ```
 Colinearity with predicting Range based n battery
+
+```{r}
+ecars %>% group_by(Make) %>%
+  filter(n() >= 10) %>%
+  ggplot(., aes(x = Battery, y = Price)) +
+  
+```
 
 ```{r}
 
@@ -326,6 +333,33 @@ broom::glance(model.full)
 model_best = lm(Price_pow ~ Efficiency_pow + Range + Battery + Speed_pow + Fast_charge, data = ecars)
 broom::glance(model.full3)
 broom::glance(model_best)
+```
+
+
+```{r}
+ecars
+model_box = lm(Price ~ Top_speed + Range + Efficiency + Fast_charge + Acceleration, data = ecars)
+summary(model_box)
+
+```
+```{r}
+bc = boxCox(model_box)
+
+lambda = bc$x[which(bc$y == max(bc$y))]
+lambda
+Price.bc = (ecars$Price^lambda - 1)/lambda
+Price.bc
+model.bc = lm(Price.bc ~ Top_speed + Range + Efficiency + Fast_charge + Acceleration, data = ecars)
+              
+summary(model.bc)
+broom::glance(model.bc)
+
+hist(Price.bc)
+```
+****This is how to undo the lambda transformation
+```{r}
+((Price.bc*lambda) + 1)^(1/lambda)
+ecars$Price
 ```
 
 
