@@ -1,0 +1,191 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(car)
+library(MASS)
+library(repr)
+library(pals)
+```
+```{r}
+ecars_raw = read.csv('EV_cars.csv')
+ecars_raw
+```
+```{r}
+ecars_raw = ecars_raw %>% rename(Price = Price.DE., Acceleration = acceleration..0.100.)
+```
+
+```{r}
+make = strsplit(ecars_raw$Car_name, split = ' ')
+
+make_ = c()
+n = length(make)
+
+for (i in 1:n) {
+  make_[i] = make[[i]][1]
+}
+
+ecars_raw$Make = make_
+```
+
+
+```{r}
+ecars_raw = ecars_raw %>% relocate(Make, .before = Car_name_link)
+ecars_raw = ecars_raw %>% relocate(Battery, .after = Car_name_link)
+ecars_raw
+```
+
+```{r}
+ecars_raw = ecars_raw %>% filter(!is.na(Fast_charge))
+ecars = ecars_raw %>% filter(!is.na(Price))
+ecars_missing_price = ecars_raw %>% filter(is.na(Price))
+```
+```{r}
+make_colors = c('#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff','#000075', '#aaffc3')
+
+```
+
+```{r}
+price_model_empty = lm(Price ~ 1, data = ecars)
+price_model_full= lm(Price ~ Battery + Efficiency + Fast_charge + Range + Top_speed + Acceleration, data = ecars)
+summary(price_model_full)
+```
+
+```{r}
+scope = list(lower = formula(price_model_empty), upper = formula(price_model_full))
+forwardAIC = step(price_model_empty, scope, direction = 'forward', k = 2)
+```
+
+```{r}
+price_model_initial = lm(Price ~ Efficiency + Fast_charge + Range + Top_speed + Acceleration, data = ecars)
+summary(price_model_initial)
+bc = boxCox(price_model_initial)
+lambda = bc$x[which(bc$y == max(bc$y))]
+ecars$Price_lambda = (ecars$Price^lambda - 1)/lambda
+price_model = lm(Price_lambda ~ Efficiency + Fast_charge + Range + Top_speed + Acceleration, data = ecars)
+summary(price_model)
+plot(price_model)
+broom::glance(price_model)
+```
+
+```{r}
+prediction = predict(price_model, ecars, interval = 'prediction')
+confidence = predict(price_model, ecars, interval = 'confidence')
+prediction_dollars = ((prediction * lambda) + 1)^(1/lambda)
+confidence_dollars = ((confidence * lambda) + 1)^(1/lambda)
+predicted_price = data.frame(Name = ecars$Car_name,
+                             Make = ecars$Make,
+                             Price = ecars$Price/1000,
+                             Predicted = (prediction_dollars[,1]/1000),
+                             Predict_lwr = (prediction_dollars[,2]/1000),
+                             Predict_upr = (prediction_dollars[,3]/1000),
+                             Confidence_lwr = (confidence_dollars[,2]/1000),
+                             Confidence_upr = (confidence_dollars[,3]/1000))
+predicted_price
+```
+```{r}
+most_makes = predicted_price %>%
+  group_by(Make)%>%
+  filter(n() >= 10) %>%
+  summarise(mean_price = mean(Price), mean_predicted = mean(Predicted))
+most_makes
+```
+
+
+```{r}
+
+ggplot(NULL, aes(Predicted_price, Price)) +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predicted), col = 'black') +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_lwr), col = 'red') +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_upr), col = 'red') +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_lwr), col = 'blue') +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_upr), col = 'blue') +
+      ylim(0,300) +
+      geom_point(data = predicted_price, aes(x = Predicted, y = Price), alpha = .5) +
+      geom_point(data = most_makes, aes(x = mean_price, y = mean_predicted, col = Make), size = 3) +
+      scale_color_manual(values = make_colors)
+
+ggplot(NULL, aes(Predicted_price, Price)) +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predicted), col = 'black') +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_lwr), col = 'red') +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_upr), col = 'red') +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_lwr), col = 'blue') +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_upr), col = 'blue') +
+      ylim(25,150) + xlim(25, 140) +
+      geom_point(data = predicted_price, aes(x = Predicted, y = Price), alpha = .5) + 
+      geom_point(data = most_makes, aes(x = mean_price, y = mean_predicted, col = Make), size = 3) +
+      scale_color_manual(values = make_colors) +
+      xlab("Predicted Price in 1000s of Euros") + ylab("Price in 1000s of Euros") +
+      ggtitle('Price of Electric Vehicles with mean cost per Make')
+# geom_point(data = most_makes, aes(x = mean_price, y = mean_predicted), size = 3, shape = 23, fill = make_colors) +
+
+```
+
+```{r}
+ecars
+ggplot(data = ecars, aes(x = Battery, y = Price)) + 
+  geom_point()
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

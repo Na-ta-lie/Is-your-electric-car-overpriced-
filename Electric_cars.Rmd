@@ -29,6 +29,8 @@ library(tidyr)
 library(car)
 library(MASS)
 library(repr)
+install.packages('pals')
+library(pals)
 install.packages('broom')
 ```
 
@@ -80,9 +82,10 @@ length(ecars$Price)
 ```
 
 ```{r}
-ecars %>% group_by(Make) %>%
-  filter(n() >= 10) %>%
-  summarise(average_cost = mean(Price))
+top_10 = ecars %>% group_by(Make) %>%
+  filter(n() >= 10) #%>%
+  #summarise(average_cost = mean(Price))
+top_10
 
 ecars %>% group_by(Make) %>%
   filter(n() >= 10) %>%
@@ -93,7 +96,46 @@ ecars %>% group_by(Make) %>%
   theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank())
-  
+
+make_colors = c('#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff','#000075', '#aaffc3')
+
+
+ecars %>% group_by(Make) %>%
+  filter(n() >= 10) %>%
+  ggplot(., aes(x = Battery, y = Price)) +
+  geom_point(aes(col = Make), size = 2) + 
+  scale_color_manual(values = make_colors)
+
+
+ecars %>% group_by(Make) %>%
+  filter(n() >= 10) %>%
+  ggplot(., aes(x = Efficiency, y = Price)) +
+  geom_point(aes(col = Make)) 
+
+efficiency_make = ecars %>% group_by(Make) %>%
+  filter(n() >= 10) %>%
+  ggplot(., aes(x = Efficiency, y = Price)) +
+  geom_point(aes(col = Make), show.legend = FALSE) +
+  facet_wrap(~Make)+
+  scale_color_manual(values = make_colors)
+efficiency_make
+
+battery_make = ecars %>% group_by(Make) %>%
+  filter(n() >= 10) %>%
+  ggplot(., aes(x = Battery, y = Price)) +
+  geom_point(aes(col = Make), show.legend = FALSE) +
+  facet_wrap(~Make)
+battery_make
+#ggsave('battery_make.png', width = 15, height = 9)
+
+#ggsave('efficiency_make.png', width = 15, height = 9)
+
+#keep working on this
+battery_price = ggplot(NULL, aes(x = Battery, y = Price)) +
+  geom_point(data = ecars, aes(x = Battery, y = Price))+
+  geom_point(data = top_10, aes(x = Battery, y = Price, col = Make))
+ 
+ggsave('battery_price.png', width = 10)
 
 #ecars %>% group_by(Make)%>%
  # summarise(average_cost = mean(Price)) %>%
@@ -112,7 +154,8 @@ length(unique(ecars_missing_price$Make))
 ```
 
 ```{r}
-plot(ecars[,3:9])
+ecars
+plot(ecars[,4:10])
 plot(ecars$Acceleration, ecars$Battery)
 
 ecars$Price_pow = (ecars$Price ** -.5)
@@ -195,22 +238,40 @@ most_makes = test2_2_dollarsnew %>% group_by(Make) %>%
 ```{r}
 
 
-gplt1 = ggplot(NULL, aes(Predicted_price, Price)) + 
-      geom_point(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Price)) +
-      geom_point(data = most_makes, aes(x = average_predicted_cost, y = average_cost, color = Make, size = 3)) +
+gplt1 = ggplot(NULL, aes(Predicted_price, Price)) +
       geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Predicted_price)) +
       geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Predicted_price_lwr), col = 'red') +
       geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Predicted_price_upr), col = 'red') +
       geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Confidence_price_lwr), col = 'blue') +
       geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Confidence_price_upr), col = 'blue') +
-      ylim(0,250)
+      ylim(0,250)+ 
+geom_point(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Price), alpha = .5) +
+geom_point(data = most_makes, aes(x = average_predicted_cost, y = average_cost), size = 3, shape = 23, fill = make_colors) +
+ scale_color_manual(values = make_colors)
 
 gplt1
 
 ggsave('gplt1.png', width = 15)
          
 ```
+```{r}
+gplt1 = ggplot(NULL, aes(Predicted_price, Price)) +
+      geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Predicted_price)) +
+      geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Predicted_price_lwr), col = 'red') +
+      geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Predicted_price_upr), col = 'red') +
+      geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Confidence_price_lwr), col = 'blue') +
+      geom_line(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Confidence_price_upr), col = 'blue') +
+      ylim(0,250)+ 
+      geom_point(data = test2_2_dollarsnew, aes(x = Predicted_price, y = Price), alpha = .5) +
+      geom_point(data = most_makes, aes(x = average_predicted_cost, y = average_cost), size = 3, shape = 23, fill = make_colors) +
+      scale_color_manual(values = make_colors)
 
+```
+
+```{r}
+test2_2_dollarsnew %>%
+  arrange(Predicted_price)
+```
 
 ```{r}
 options(repr.plot.width = 15, repr.plot.height =2) 
