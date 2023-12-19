@@ -22,9 +22,24 @@ server <- function(input, output, session) {
     p <- ggplot(subsetted(), aes(!!input$xvar, !!input$yvar)) + 
       list(theme(legend.position = "bottom"),
       if (input$by_make) aes(color = Make),
-      geom_point(),
+      geom_point(), 
       if (input$smooth) geom_smooth()
     )
     p
   }, res = 100)
+  
+
+  output$regression <- renderPlot({
+    p2 <- ggplot(NULL, aes(Predicted_price, Price)) +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predicted), col = 'black') +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_lwr), col = 'red') +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_upr), col = 'red') +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_lwr), col = 'blue') +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_upr), col = 'blue') +
+      geom_point(data = predicted_price, aes(x = Predicted, y = Price), alpha = .5) + 
+      ylim(25, input$ylab) + xlim(25, input$xlab)
+  })
 }
+
+
+

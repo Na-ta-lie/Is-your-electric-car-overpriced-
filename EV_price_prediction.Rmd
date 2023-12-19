@@ -93,6 +93,7 @@ predicted_price = data.frame(Name = ecars$Car_name,
                              Confidence_lwr = (confidence_dollars[,2]/1000),
                              Confidence_upr = (confidence_dollars[,3]/1000))
 predicted_price
+write.csv(predicted_price,file='/Users/Natalie/git_proj/Is-your-electric-car-overpriced-/predicted_price.csv', row.names=FALSE)
 ```
 ```{r}
 most_makes = predicted_price %>%
