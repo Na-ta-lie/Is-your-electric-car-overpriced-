@@ -48,6 +48,8 @@ ecars_raw
 ecars_raw = ecars_raw %>% filter(!is.na(Fast_charge))
 ecars = ecars_raw %>% filter(!is.na(Price))
 ecars_missing_price = ecars_raw %>% filter(is.na(Price))
+write.csv(ecars,file='/Users/Natalie/git_proj/Is-your-electric-car-overpriced-/ecars.csv', row.names=FALSE)
+getwd()
 ```
 ```{r}
 make_colors = c('#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff','#000075', '#aaffc3')
@@ -99,6 +101,10 @@ most_makes = predicted_price %>%
   summarise(mean_price = mean(Price), mean_predicted = mean(Predicted))
 most_makes
 ```
+```{r}
+predicted_price %>%
+  filter(Make == 'Porsche')
+```
 
 
 ```{r}
@@ -111,18 +117,18 @@ ggplot(NULL, aes(Predicted_price, Price)) +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_upr), col = 'blue') +
       ylim(0,300) +
       geom_point(data = predicted_price, aes(x = Predicted, y = Price), alpha = .5) +
-      geom_point(data = most_makes, aes(x = mean_price, y = mean_predicted, col = Make), size = 3) +
+      geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price, col = Make), size = 3) +
       scale_color_manual(values = make_colors)
 
 ggplot(NULL, aes(Predicted_price, Price)) +
-      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predicted), col = 'black') +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predicted), col = 'black', linetype = 'dashed') +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_lwr), col = 'red') +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_upr), col = 'red') +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_lwr), col = 'blue') +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_upr), col = 'blue') +
       ylim(25,150) + xlim(25, 140) +
       geom_point(data = predicted_price, aes(x = Predicted, y = Price), alpha = .5) + 
-      geom_point(data = most_makes, aes(x = mean_price, y = mean_predicted, col = Make), size = 3) +
+      geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price, col = Make), size = 3) +
       scale_color_manual(values = make_colors) +
       xlab("Predicted Price in 1000s of Euros") + ylab("Price in 1000s of Euros") +
       ggtitle('Price of Electric Vehicles with mean cost per Make')
@@ -137,15 +143,29 @@ ggplot(data = ecars, aes(x = Battery, y = Price)) +
 ```
 
 ```{r}
+unique(ecars_missing_price$Make)
 
 ```
 
 ```{r}
+prediction_missing = predict(price_model, ecars_missing_price, interval = 'prediction')
+prediction_missing
+prediction_missing_dollars = ((prediction_missing * lambda) + 1)^(1/lambda)
 
+predicted_missing_price = data.frame(Name = ecars_missing_price$Car_name,
+                             Make = ecars_missing_price$Make,
+                             Predicted = (prediction_missing_dollars[,1]/1000))
+                           
+predicted_missing_price
 ```
 
 ```{r}
+predicted_missing_price %>%
+  group_by(Make) %>%
+  filter(n()>=3)
 
+predicted_missing_price %>%
+  filter(Make == 'Rolls-Royce')
 ```
 
 ```{r}

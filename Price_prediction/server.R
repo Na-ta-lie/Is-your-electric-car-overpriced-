@@ -10,19 +10,21 @@
 library(shiny)
 
 # Define server logic required to draw a histogram
-function(input, output, session) {
 
-    output$distPlot <- renderPlot({
 
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
-
-    })
-
+server <- function(input, output, session) {
+  subsetted <- reactive({
+    req(input$make)
+    ecars |> filter(Make %in% input$make)
+  })
+  
+  output$scatter <- renderPlot({
+    p <- ggplot(subsetted(), aes(!!input$xvar, !!input$yvar)) + 
+      list(theme(legend.position = "bottom"),
+      if (input$by_make) aes(color = Make),
+      geom_point(),
+      if (input$smooth) geom_smooth()
+    )
+    p
+  }, res = 100)
 }

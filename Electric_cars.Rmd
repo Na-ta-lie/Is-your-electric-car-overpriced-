@@ -118,6 +118,7 @@ efficiency_make = ecars %>% group_by(Make) %>%
   geom_point(aes(col = Make), show.legend = FALSE) +
   facet_wrap(~Make)+
   scale_color_manual(values = make_colors)
+
 efficiency_make
 
 battery_make = ecars %>% group_by(Make) %>%
@@ -135,6 +136,7 @@ battery_price = ggplot(NULL, aes(x = Battery, y = Price)) +
   geom_point(data = ecars, aes(x = Battery, y = Price))+
   geom_point(data = top_10, aes(x = Battery, y = Price, col = Make))
  
+battery_price
 ggsave('battery_price.png', width = 10)
 
 #ecars %>% group_by(Make)%>%
