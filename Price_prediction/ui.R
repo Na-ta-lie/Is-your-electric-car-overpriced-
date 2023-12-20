@@ -62,8 +62,8 @@ fluidPage(theme = shinytheme("slate"),
             actionButton("submitbutton",
                          "Submit", 
                           class = "btn btn-primary \n"),
-            sliderInput('xlab', 'x zoom', 0, 300, 300, ticks = TRUE),
-            sliderInput('ylab', 'y zoom', 0, 300, 300, ticks = TRUE)
+            sliderInput('xlab', 'x zoom', 0, 500, 150, ticks = TRUE),
+            sliderInput('ylab', 'y zoom', 0, 500, 150, ticks = TRUE)
                         ),
         mainPanel(
             tags$label(h3('Expected Price in Euros')), # Status/Output Text Box

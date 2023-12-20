@@ -438,6 +438,9 @@ plot( x = 50, y = 54)
 lines(predicted_price$Predicted, predicted_price$Predicted)
 ```
 
+```{r}
+ecars_missing_price
+```
 
 
 

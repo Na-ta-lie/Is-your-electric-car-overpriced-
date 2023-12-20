@@ -83,11 +83,11 @@ server <- function(input, output, session) {
                      y1 = ap)
     
     ggplot(NULL, aes(Predicted_price, Price)) +
-      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predicted), col = 'black') +
-      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_lwr), col = 'red') +
-      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_upr), col = 'red') +
-      geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_lwr), col = 'blue') +
-      geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_upr), col = 'blue') +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predicted), col = 'blue', size = .5, alpha = .8) +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_lwr), col = 'red', linetype = 'dashed', alpha = .8) +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_upr), col = 'red', linetype = 'dashed', alpha = .8) +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_lwr), col = 'black', linetype = 'dashed', alpha = .8) +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_upr), col = 'black', linetype = 'dashed', alpha = .8) +
       geom_point(data = predicted_price, aes(x = Predicted, y = Price), alpha = .5)+
       geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price), size = 4) +
       geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price, col = Make), size = 3) +
