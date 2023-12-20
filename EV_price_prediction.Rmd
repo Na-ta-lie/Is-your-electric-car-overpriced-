@@ -18,7 +18,7 @@ library(pals)
 ```
 ```{r}
 ecars_raw = read.csv('EV_cars.csv')
-ecars_raw
+
 ```
 ```{r}
 ecars_raw = ecars_raw %>% rename(Price = Price.DE., Acceleration = acceleration..0.100.)
@@ -49,6 +49,8 @@ ecars_raw = ecars_raw %>% filter(!is.na(Fast_charge))
 ecars = ecars_raw %>% filter(!is.na(Price))
 ecars_missing_price = ecars_raw %>% filter(is.na(Price))
 write.csv(ecars,file='/Users/Natalie/git_proj/Is-your-electric-car-overpriced-/ecars.csv', row.names=FALSE)
+write.csv(most_makes,file='/Users/Natalie/git_proj/Is-your-electric-car-overpriced-/most_makes.csv', row.names=FALSE)
+
 getwd()
 ```
 ```{r}
@@ -135,6 +137,7 @@ ggplot(NULL, aes(Predicted_price, Price)) +
       ggtitle('Price of Electric Vehicles with mean cost per Make')
 # geom_point(data = most_makes, aes(x = mean_price, y = mean_predicted), size = 3, shape = 23, fill = make_colors) +
 
+
 ```
 
 ```{r}
@@ -170,11 +173,17 @@ predicted_missing_price %>%
 ```
 
 ```{r}
-
+summary(price_model)
+saveRDS(price_model, "model.rds")
 ```
 
 ```{r}
+test_predict = data.frame(Efficiency = 172, Fast_charge = 670, Range = 435, Top_speed = 217, Acceleration = 5)
+test_predict
 
+
+as.numeric((((predict(price_model, test_predict)) *lambda) + 1)^(1/lambda))
+                                                                   
 ```
 
 ```{r}

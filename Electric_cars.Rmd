@@ -238,6 +238,12 @@ most_makes = test2_2_dollarsnew %>% group_by(Make) %>%
 ```
 
 ```{r}
+ecars
+
+```
+
+
+```{r}
 
 
 gplt1 = ggplot(NULL, aes(Predicted_price, Price)) +
@@ -426,6 +432,11 @@ ecars$Price
 ```
 
 
+```{r}
+plot.new()
+plot( x = 50, y = 54)
+lines(predicted_price$Predicted, predicted_price$Predicted)
+```
 
 
 

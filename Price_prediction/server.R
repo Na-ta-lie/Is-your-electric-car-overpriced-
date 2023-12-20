@@ -20,6 +20,7 @@ server <- function(input, output, session) {
   
   output$scatter <- renderPlot({
     p <- ggplot(subsetted(), aes(!!input$xvar, !!input$yvar)) + 
+      scale_color_manual(values = make_colors) +
       list(theme(legend.position = "bottom"),
       if (input$by_make) aes(color = Make),
       geom_point(), 
@@ -29,15 +30,76 @@ server <- function(input, output, session) {
   }, res = 100)
   
 
-  output$regression <- renderPlot({
-    p2 <- ggplot(NULL, aes(Predicted_price, Price)) +
+  
+  datasetInput <- reactive({  
+    
+    df <- data.frame(Efficiency = input$eff,
+                      Fast_charge = input$fc, 
+                      Range = input$range, 
+                      Top_speed = input$ts, 
+                      Acceleration = input$acc,
+                      stringsAsFactors = FALSE)
+   
+    input <- df
+    
+    Output <- (((predict(model, df)) *lambda) + 1)^(1/lambda)
+    
+    print(Output)
+    
+  })
+  
+  # Status/Output Text Box
+  output$contents <- renderPrint({
+    if (input$submitbutton>0) { 
+      isolate("Calculation complete.") 
+    } else {
+      return("Server is ready for calculation.")
+    }
+  })
+  
+  # Prediction results table
+  output$tabledata <- renderTable({
+    if (input$submitbutton>0) { 
+      isolate(datasetInput()) 
+    } 
+  })
+  
+  output$predicted <- renderPlot({
+    df <- data.frame(Efficiency = input$eff,
+                     Fast_charge = input$fc, 
+                     Range = input$range, 
+                     Top_speed = input$ts, 
+                     Acceleration = input$acc,
+                     stringsAsFactors = FALSE)
+    ap = input$ap 
+    ymax = input$ylab
+    xmax = input$xlab
+    
+    input <- df
+    
+    pp = as.numeric(((predict(model, df)) *lambda) + 1)^(1/lambda)   
+    
+    df2 = data.frame(x1 = pp,
+                     y1 = ap)
+    
+    ggplot(NULL, aes(Predicted_price, Price)) +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Predicted), col = 'black') +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_lwr), col = 'red') +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_upr), col = 'red') +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_lwr), col = 'blue') +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_upr), col = 'blue') +
-      geom_point(data = predicted_price, aes(x = Predicted, y = Price), alpha = .5) + 
-      ylim(25, input$ylab) + xlim(25, input$xlab)
+      geom_point(data = predicted_price, aes(x = Predicted, y = Price), alpha = .5)+
+      geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price), size = 4) +
+      geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price, col = Make), size = 3) +
+      geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price), size = 1) +
+      geom_point(data = df2, aes(x = x1/1000, y = y1/1000), size = 7, pch= 18, col = 'black') +
+      geom_point(data = df2, aes(x = x1/1000, y = y1/1000), size = 6, pch= 18, col = 'yellow') +
+      geom_point(data = df2, aes(x = x1/1000, y = y1/1000), size = 3, pch= 18, col = 'black') +
+      theme(legend.position = "bottom")+
+      ylim(25, ymax) + xlim(25, xmax) +
+      scale_color_manual(values = make_colors) +
+      xlab("Predicted Price in 1000s of Euros") + ylab("Price in 1000s of Euros") +
+      ggtitle('Price of Electric Vehicles with mean cost per Make')
   })
 }
 
