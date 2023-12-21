@@ -11,7 +11,6 @@ ecars = read.csv('ecars.csv')
 ecars_vars = ecars[,4:10]
 ecars_make  = ecars %>% group_by(Make) %>%
   filter(n()>=10)
-ecars_make
 most_makes = read.csv('most_makes.csv')
 predicted_price = read.csv('predicted_price.csv')
 
