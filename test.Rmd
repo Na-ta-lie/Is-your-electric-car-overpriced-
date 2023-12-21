@@ -73,7 +73,7 @@ ui <- page_sidebar(
  selectizeInput(inputId = 'xvar',
                      label = 'X Variable',
                      choices = ecars_vars),
-      selectizeInput(inputId = 'yvar',
+selectizeInput(inputId = 'yvar',
                      label = 'Y Variable',
                      choices = ecars_vars)
 ```

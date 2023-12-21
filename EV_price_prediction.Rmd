@@ -54,8 +54,11 @@ write.csv(most_makes,file='/Users/Natalie/git_proj/Is-your-electric-car-overpric
 getwd()
 ```
 ```{r}
-make_colors = c('#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff','#000075', '#aaffc3')
-
+make_colors = c('#e6194b', '#f58231',  '#ffe119', 
+                '#bcf60c','#3cb44b', '#008080',
+                '#aaffc3', '#4363d8', '#000075',
+                '#46f0f0', '#911eb4', '#e6beff',
+                '#f032e6', '#fabebe')
 ```
 
 ```{r}
@@ -125,7 +128,7 @@ ggplot(NULL, aes(Predicted_price, Price)) +
 
 ggplot(NULL, aes(Predicted_price, Price)) +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Predicted), col = 'black', linetype = 'dashed') +
-      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_lwr), col = 'red') +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_lwr), col = 'red', linetype = 'dashed') +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_upr), col = 'red') +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_lwr), col = 'blue') +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_upr), col = 'blue') +
@@ -135,6 +138,8 @@ ggplot(NULL, aes(Predicted_price, Price)) +
       scale_color_manual(values = make_colors) +
       xlab("Predicted Price in 1000s of Euros") + ylab("Price in 1000s of Euros") +
       ggtitle('Price of Electric Vehicles with mean cost per Make')
+
+
 # geom_point(data = most_makes, aes(x = mean_price, y = mean_predicted), size = 3, shape = 23, fill = make_colors) +
 
 
@@ -178,11 +183,6 @@ saveRDS(price_model, "model.rds")
 ```
 
 ```{r}
-test_predict = data.frame(Efficiency = 172, Fast_charge = 670, Range = 435, Top_speed = 217, Acceleration = 5)
-test_predict
-
-
-as.numeric((((predict(price_model, test_predict)) *lambda) + 1)^(1/lambda))
                                                                    
 ```
 

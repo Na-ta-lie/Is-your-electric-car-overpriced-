@@ -88,18 +88,58 @@ server <- function(input, output, session) {
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_upr), col = 'red', linetype = 'dashed', alpha = .8) +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_lwr), col = 'black', linetype = 'dashed', alpha = .8) +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_upr), col = 'black', linetype = 'dashed', alpha = .8) +
-      geom_point(data = predicted_price, aes(x = Predicted, y = Price), alpha = .5)+
+      geom_point(data = predicted_price, aes(x = Predicted, y = Price), alpha = .5) +
+      geom_point(data = df2, aes(x = x1/1000, y = y1/1000), size = 7, pch= 18, col = 'black') +
+      geom_point(data = df2, aes(x = x1/1000, y = y1/1000), size = 6, pch= 18, col = 'yellow') +
+      geom_point(data = df2, aes(x = x1/1000, y = y1/1000), size = 3, pch= 18, col = 'black') +
+      theme(legend.position = "bottom", legend.text = element_text(size = 10))+
+      ylim(25, ymax) + xlim(25, xmax) +
+      xlab("Predicted Price in 1000s of Euros") + ylab("Price in 1000s of Euros") +
+      ggtitle('Predicted Price vs. Price for all EV Models')  
+    
+    
+      
+  })
+  
+  output$predicted_mean <- renderPlot({
+    df <- data.frame(Efficiency = input$eff,
+                     Fast_charge = input$fc, 
+                     Range = input$range, 
+                     Top_speed = input$ts, 
+                     Acceleration = input$acc,
+                     stringsAsFactors = FALSE)
+    ap = input$ap 
+    ymax = input$ylab
+    xmax = input$xlab
+    
+    input <- df
+    
+    pp = as.numeric(((predict(model, df)) *lambda) + 1)^(1/lambda)   
+    
+    df2 = data.frame(x1 = pp,
+                     y1 = ap)
+    
+    ggplot(NULL, aes(Predicted_price, Price)) +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predicted), col = 'blue', size = .5, alpha = .8) +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_lwr), col = 'red', linetype = 'dashed', alpha = .8) +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_upr), col = 'red', linetype = 'dashed', alpha = .8) +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_lwr), col = 'black', linetype = 'dashed', alpha = .8) +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_upr), col = 'black', linetype = 'dashed', alpha = .8) +
       geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price), size = 4) +
       geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price, col = Make), size = 3) +
       geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price), size = 1) +
       geom_point(data = df2, aes(x = x1/1000, y = y1/1000), size = 7, pch= 18, col = 'black') +
       geom_point(data = df2, aes(x = x1/1000, y = y1/1000), size = 6, pch= 18, col = 'yellow') +
       geom_point(data = df2, aes(x = x1/1000, y = y1/1000), size = 3, pch= 18, col = 'black') +
-      theme(legend.position = "bottom")+
+      theme(legend.position = "bottom", legend.text = element_text(size = 10))+
+      labs(col = 'Car Make') +
       ylim(25, ymax) + xlim(25, xmax) +
       scale_color_manual(values = make_colors) +
       xlab("Predicted Price in 1000s of Euros") + ylab("Price in 1000s of Euros") +
-      ggtitle('Price of Electric Vehicles with mean cost per Make')
+      ggtitle('Predicted Price vs. Price for each Make with 10+ Models (mean of price of all models)')  
+    
+    
+    
   })
 }
 
