@@ -80,6 +80,20 @@ After cleaning the data 45 unique car makes were included in the ecars data used
 ```{r}
 length(ecars$Price)
 ```
+```{r}
+ecars %>% group_by(Make) %>%
+  filter(n() >= 10) %>%
+  summarise(average_cost = (mean(Price)/1000)) %>%
+  ggplot(., aes(x = Make, y = average_cost, fill = Make, label = Make)) +
+  geom_bar(stat = 'identity') +
+  scale_fill_manual(values = make_colors) +
+  ylab('Average cost in Germany in 100s of eruros')+
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  geom_text(angle = 90, position = position_stack(vjust = 0.5)) + 
+  theme(legend.position = "none")
+```
 
 ```{r}
 top_10 = ecars %>% group_by(Make) %>%
@@ -87,17 +101,13 @@ top_10 = ecars %>% group_by(Make) %>%
   #summarise(average_cost = mean(Price))
 top_10
 
-ecars %>% group_by(Make) %>%
-  filter(n() >= 10) %>%
-  summarise(average_cost = (mean(Price)/1000)) %>%
-  ggplot(., aes(x = Make, y = average_cost)) +
-  geom_col(aes(fill = Make)) + 
-  ylab('Average cost in Germany in thousands of Eruros')+
-  theme(axis.title.x=element_blank(),
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank())
 
-make_colors = c('#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff','#000075', '#aaffc3')
+
+make_colors = c('#e6194b', '#f58231',  '#ffe119', 
+                '#bcf60c','#3cb44b', '#008080',
+                '#aaffc3', '#4363d8', '#000075',
+                '#46f0f0', '#911eb4', '#e6beff',
+                '#f032e6', '#fabebe')
 
 
 ecars %>% group_by(Make) %>%
@@ -131,11 +141,11 @@ battery_make
 
 #ggsave('efficiency_make.png', width = 15, height = 9)
 
-#keep working on this
-battery_price = ggplot(NULL, aes(x = Battery, y = Price)) +
-  geom_point(data = ecars, aes(x = Battery, y = Price))+
-  geom_point(data = top_10, aes(x = Battery, y = Price, col = Make))
- 
+#keep working on this'
+battery_price = ggplot(NULL, aes(x = 'Battery', y = Price)) +
+  geom_point(data = ecars, aes(x = Battery, y = Price)) +
+  geom_point(data = top_10, aes(x = Battery, y = Price, col = Make))# + scale_color_manual(values = make_colors)#
+
 battery_price
 ggsave('battery_price.png', width = 10)
 
@@ -143,6 +153,59 @@ ggsave('battery_price.png', width = 10)
  # summarise(average_cost = mean(Price)) %>%
   #arrange(average_cost)
 ```
+```{r}
+ecars %>% group_by(Make) %>%
+  filter(n() >= 10) %>%
+  ggplot(., aes(x = Battery, y = Price)) +
+  geom_point(aes(col = Make), show.legend = FALSE) 
+
+BatvPrice = ggplot(NULL, aes(x = Battery, y = Price)) +
+  geom_point(data = ecars, aes(x = Battery, y = Price, fill = 'black')) +
+  geom_point(data = top_10, aes(x = Battery, y = Price, col = Make)) + 
+  scale_color_manual(values = make_colors)+
+  xlab("Battery Capacity (kWh)") + 
+  ylab("Price in Germany (euros) ") +
+  ggtitle('Electric Vehicle Battery vs. Price (makes with 10+ Models Highlighted)') +
+  labs(fill="") +
+  scale_fill_discrete(labels=c('Other')) +
+  theme(legend.position = "bottom")
+
+BatvPrice
+
+ggsave('BatvPrice.png', width = 10)
+
+ecars
+```
+```{r}
+BatvRange = ggplot(NULL, aes(x = Battery, y = Range)) +
+  geom_point(data = ecars, aes(x = Battery, y = Range, fill = 'black')) +
+  geom_point(data = top_10, aes(x = Battery, y = Range, col = Make)) + 
+  scale_color_manual(values = make_colors)+
+  xlab("Battery Capacity (kWh)") + 
+  ylab("Range (km on one charge) ") +
+  ggtitle('Electric Vehicle Battery vs. Range (makes with 10+ Models Highlighted)') +
+  labs(fill="") +
+  scale_fill_discrete(labels=c('Other')) +
+  theme(legend.position = "bottom")
+
+
+AccvPrice = ggplot(NULL, aes(x = Acceleration, y = Price)) +
+  geom_point(data = ecars, aes(x = Acceleration, y = Price, fill = 'black')) +
+  geom_point(data = top_10, aes(x = Acceleration, y = Price, col = Make)) + 
+  scale_color_manual(values = make_colors)+
+  xlab("Acceleration (seconds to 100 km/hr)") + 
+  ylab("Price in Germany (euros) ") +
+  ggtitle('Acceleration vs. Price (makes with 10+ Models Highlighted)') +
+  labs(fill="") +
+  xlim(2,15)+
+  scale_fill_discrete(labels=c('Other')) +
+  theme(legend.position = "bottom")
+
+BatvRange
+BatvPrice
+AccvPrice
+```
+
 
 
 

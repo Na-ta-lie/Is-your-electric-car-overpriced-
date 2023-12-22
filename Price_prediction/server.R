@@ -94,7 +94,7 @@ server <- function(input, output, session) {
       geom_point(data = df2, aes(x = x1/1000, y = y1/1000), size = 3, pch= 18, col = 'black') +
       theme(legend.position = "bottom", legend.text = element_text(size = 10))+
       ylim(25, ymax) + xlim(25, xmax) +
-      xlab("Predicted Price in 1000s of Euros") + ylab("Price in 1000s of Euros") +
+      xlab("Predicted price (euros in thousands)") + ylab("Price (euros in thousands)") +
       ggtitle('Predicted Price vs. Price for all EV Models')  
     
     
@@ -135,7 +135,7 @@ server <- function(input, output, session) {
       labs(col = 'Car Make') +
       ylim(25, ymax) + xlim(25, xmax) +
       scale_color_manual(values = make_colors) +
-      xlab("Predicted Price in 1000s of Euros") + ylab("Price in 1000s of Euros") +
+      xlab("Predicted Price (euros in thousands)") + ylab("Price (euros in thousands)") +
       ggtitle('Predicted Price vs. Price for each Make with 10+ Models (mean of price of all models)')  
     
     

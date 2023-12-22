@@ -48,7 +48,7 @@ fluidPage(theme = shinytheme("slate"),
           tags$label(h5("Price: The price of the electric vehicle in Germany in euros.")),
           tags$label(h5("Range: The driving range of the vehicle on a single charge in kilometers.")),
           tags$label(h5("Top_speed: The maximum speed the vehicle can achieve in kilometers per hour.")),
-          tags$label(h5("Acceleration: The acceleration time from 0 to 100 kilometers per hour.")),
+          tags$label(h5("Acceleration: The acceleration time(s) from 0 to 100 kilometers per hour.")),
           fluidRow(plotOutput("scatter"))
                   )
                 )
