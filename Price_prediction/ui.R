@@ -15,12 +15,12 @@ library(shiny)
 fluidPage(theme = shinytheme("united"),
   navbarPage("Is Your Electric Car Overpriced?",
     tabPanel('Welcome!',
-            h1("Welcome to the Electric Car Price Predictor!", 
+            h2("Welcome to the Electric Car Price Predictor!", 
                 style="text-align:center"),
-            h2("This Shiny App allows you to explore and compare the features of electric vehicles,
-               and can predict the price of an electric vehicle given its features so you can avoid overpa!", 
+            h3("This Shiny App allows you to explore and compare the features of electric vehicles,
+               and can predict the price of an electric vehicle given its features so you can avoid overpaying!", 
                 style="text-align:center"),
-            h4("* * * * * * * * * * * * * * * * * * * * * * * * * * *",
+            h6("* * * * * * * * * * * * * * * * * * * * * * * * * * *",
                style = 'text-align:center'),
             div(img(src='ecar.png', height="50%", width="50%"), style="text-align: center;")
         ),
@@ -33,7 +33,7 @@ fluidPage(theme = shinytheme("united"),
             ),
         fluidRow(
           column(5,
-            h4("The original set included 360 observation and 9 varibles.
+            h4("The original data set included 360 observation and 9 varibles.
                51 models that did not include prices and two models that did not have fast charge were filtered out.
                Makes with 10 or more models are highlighted in the visuals."),
             h4('The continuous variables included in the dataset are the following:'),
@@ -118,8 +118,8 @@ fluidPage(theme = shinytheme("united"),
     navbarMenu("Linear Model",
       tabPanel("About the Linear Model",
           fluidRow(
-            tags$label(h3('This multiple linear regression uses all the quantititive varaibles from
-                          the data set except Battery, which was eliminated using an AIC. The Price was 
+            tags$label(h3('The inputs of this multiple linear regression are all the quantititive varaibles from
+                          the data set except Battery, which was eliminated using an AIC. The output is Price. Price was 
                           transformed using a BoxCox transformation. I used the linear model to predict the prices of 
                           the vehicles in the data set. I then plotted the predicted price against the actual
                           price to easily visualize which vehicles cost more vs. less than predicted.')),
@@ -138,7 +138,6 @@ fluidPage(theme = shinytheme("united"),
                   )
                ),
       tabPanel('Price Predictor',
-        headerPanel('Price Predictor'),
         sidebarPanel(
           tags$label(h3('Input parameters')),
             numericInput("eff", 
@@ -166,7 +165,7 @@ fluidPage(theme = shinytheme("united"),
             sliderInput('ylab', 'y zoom', 0, 500, 150, ticks = TRUE),
                         width = 3),
         mainPanel(
-            tags$label(h3('Predicted price in euros based on linear model')),
+            tags$label(h3('Predict what the price (euros) of an electric car should be!')),
             tags$label(h4('Input the required fields for an electric vehicle. 
                           The model will predict its price using these fields. 
                           Compare the predicted price to the actual price of the 

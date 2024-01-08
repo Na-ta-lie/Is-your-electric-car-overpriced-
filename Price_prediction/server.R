@@ -26,13 +26,29 @@ server <- function(input, output, session) {
          main = 'Comparison of all Quantitive Features')  
   })
   
+  #boxvar <- reactive({
+  #  !!input$var
+  #  })
+  #  
+  
   output$box <- renderPlot({
+  
+    #plot_ly(
+    #  data = ecars,
+    #  x = ~boxvar,
+    #  type = "box",
+    #  text = ~Car_name,
+    #  tooltip = c("x", "text")
+    #)
+    
     ggplot(ecars, aes(!!input$var, y = factor(0))) +
       geom_boxplot()+
       theme(axis.title.y=element_blank(),
             axis.text.y=element_blank(),
             axis.ticks.y=element_blank()) +
       ggtitle('Box Plot of Selected Feature')  
+    
+    #ggplotly(p2, x = !!input$var)
   })
   
   output$box2 <- renderPlot({
@@ -43,7 +59,9 @@ server <- function(input, output, session) {
                    outlier.size=2, 
                    notch=FALSE) +
       theme(legend.position = "none") +
-      ggtitle('Box Plots of Selected Feature by Makes with 10 or More Models')  
+      ggtitle('Box Plots of Selected Feature by Makes with 10 or More Models') 
+    
+    
   })
   
   output$hist <- renderPlot({

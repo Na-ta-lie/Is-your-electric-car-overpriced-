@@ -397,6 +397,28 @@ gplt1 = ggplot(NULL, aes(Predicted_price, Price)) +
 test2_2_dollarsnew %>%
   arrange(Predicted_price)
 ```
+```{r}
+ecars
+plot_ly(
+  data = ecars_make,
+  x = ~Price,
+  type = "box",
+  text = ~Car_name,
+  tooltip = c("x", "text")
+)
+
+plot_ly(
+  data = ecars_make,
+  x = ~Price,
+  y = ~Make,
+  type = "box",
+  color = ~Make,
+  colors = make_colors,
+  text = ~Car_name,
+  tooltip = c("x", "text"),
+  showlegend = FALSE
+)
+```
 
 ```{r}
 options(repr.plot.width = 15, repr.plot.height =2) 
