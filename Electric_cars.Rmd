@@ -81,6 +81,49 @@ After cleaning the data 45 unique car makes were included in the ecars data used
 length(ecars$Price)
 ```
 ```{r}
+ecars
+library(tibble)
+
+ggplot(ecars, aes(Price, y = factor(0))) +
+  geom_boxplot()+
+  theme(axis.title.y=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank())
+
+
+
+```
+```{r}
+Noecars = ecars
+
+Noecars$Make2 = Noecars$Make
+Noecars
+makes = most_makes$Make
+makes
+Noecars$Make3 = ifelse(Noecars$Make2 %in% makes, Noecars$Make2, "Other")
+Noecars$Make2 %in% makes
+Noecars
+```
+
+```{r}
+ecars_make
+
+is_outlier <- function(x) {
+  return(x < quantile(x, 0.25) - 1.5 * IQR(x) | x > quantile(x, 0.75) + 1.5 * IQR(x))
+}
+
+dat <- ecars %>% tibble::rownames_to_column(var="outlier") %>%
+  mutate(is_outlier=ifelse(is_outlier(Price), Price, as.numeric(NA)))
+
+dat
+dat$outlier[which(is.na(dat$is_outlier))] <- as.numeric(NA)
+
+ggplot(dat, aes(y=Price, x=factor(0))) + geom_boxplot() + geom_text(aes(label=outlier),na.rm=TRUE,nudge_y=0.1)
+
+ggplot(ecars_make, aes(Top_speed, Make, fill = Make)) +
+   scale_fill_manual(values = make_colors)+
+  geom_boxplot(outlier.colour="black", outlier.shape=16, outlier.size=2, notch=FALSE)
+```
+
+```{r}
 ecars %>% group_by(Make) %>%
   filter(n() >= 10) %>%
   summarise(average_cost = (mean(Price)/1000)) %>%
@@ -93,6 +136,9 @@ ecars %>% group_by(Make) %>%
         axis.ticks.x=element_blank()) +
   geom_text(angle = 90, position = position_stack(vjust = 0.5)) + 
   theme(legend.position = "none")
+```
+```{r}
+ecars
 ```
 
 ```{r}
@@ -177,6 +223,13 @@ ggsave('BatvPrice.png', width = 10)
 ecars
 ```
 ```{r}
+ggarrange(a, b, c, d, 
+          labels = c("A", "B", "C", "D"),
+          ncol = 2, nrow = 2)
+```
+
+
+```{r}
 BatvRange = ggplot(NULL, aes(x = Battery, y = Range)) +
   geom_point(data = ecars, aes(x = Battery, y = Range, fill = 'black')) +
   geom_point(data = top_10, aes(x = Battery, y = Range, col = Make)) + 
@@ -216,11 +269,12 @@ unique(ecars_missing_price$Make)
 length(unique(ecars$Make))
 length(unique(ecars_missing_price$Make))
 
+ecars_missing_price
 ```
 
 ```{r}
 ecars
-plot(ecars[,4:10])
+plot(ecars[,4:10], main = 'Comparison of all Quantitive Features')
 plot(ecars$Acceleration, ecars$Battery)
 
 ecars$Price_pow = (ecars$Price ** -.5)
@@ -238,7 +292,7 @@ Colinearity with predicting Range based n battery
 
 ```{r}
 ecars %>% group_by(Make) %>%
-  filter(n() >= 10) %>%
+  filter(n() >= 10) %>%o
   ggplot(., aes(x = Battery, y = Price)) +
   
 ```

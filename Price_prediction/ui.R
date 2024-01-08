@@ -12,75 +12,137 @@ library(shiny)
 # Define UI for application that draws a histogram
 
 
-fluidPage(theme = shinytheme("slate"),
+fluidPage(theme = shinytheme("united"),
   navbarPage("Is Your Electric Car Overpriced?",
-    tabPanel("Variable Relationships",
-      sidebarLayout(
-        sidebarPanel(
-          tags$label(h3('Select Variables')),
-          varSelectInput("xvar", 
-                         "X variable", 
-                         ecars_vars, 
-                         selected = "Battery"),
-          varSelectInput("yvar", 
-                         "Y variable", 
-                         ecars_vars, 
-                         selected = "Price"),
-          checkboxGroupInput("make", "Filter by Make",
-                              choices = unique(ecars_make$Make), 
-                              selected = unique(ecars_make$Make)),
-          hr(), # Add a horizontal rule
-          checkboxInput("by_make", "Show Make", TRUE),
-          checkboxInput("smooth", "Add Smoother"),
-          ),
-        mainPanel(
-          tags$label(h3('This collection of data on electric vehicles 
-                        came from Kaggle. The original set included 
-                        360 observations and 9 variables.')),
-          tags$label(h6('https://www.kaggle.com/datasets/fatihilhan/electric-vehicle-specifications-and-prices/')),
-          tags$label(h4('The visual below allows comparison of 
-                        the quantitative variables from the dataset. 
-                        Only data from car makes that have 10+ models are 
-                        displayed.The variables included are the following:')),
-          tags$label(h5("Battery: The capacity of the vehicle's battery in kilowatt-hours (kWh)")),
-          tags$label(h5("Efficiency: The energy efficiency rating of the vehicle in watt-hours per kilometer (Wh/km).")),
-          tags$label(h5("Fast_charge: The fast-charging capability of the vehicle in minutes for a certain charging percentage.")),
-          tags$label(h5("Price: The price of the electric vehicle in Germany in euros.")),
-          tags$label(h5("Range: The driving range of the vehicle on a single charge in kilometers.")),
-          tags$label(h5("Top_speed: The maximum speed the vehicle can achieve in kilometers per hour.")),
-          tags$label(h5("Acceleration: The acceleration time(s) from 0 to 100 kilometers per hour.")),
-          fluidRow(plotOutput("scatter"))
-                  )
-                )
+    tabPanel('Welcome!',
+            h1("Welcome to the Electric Car Price Predictor!", 
+                style="text-align:center"),
+            h2("This Shiny App allows you to explore and compare the features of electric vehicles,
+               and can predict the price of an electric vehicle given its features so you can avoid overpa!", 
+                style="text-align:center"),
+            h4("* * * * * * * * * * * * * * * * * * * * * * * * * * *",
+               style = 'text-align:center'),
+            div(img(src='ecar.png', height="50%", width="50%"), style="text-align: center;")
+        ),
+    navbarMenu("Explore the Data", 
+      tabPanel("About the Data",
+        fluidRow(
+          h2("This collection of data, Electric Vehicle Specifications and Prices, came from Kaggle.
+          It is a collection of data scraped from EV Database."),
+          uiOutput('tab1')
+            ),
+        fluidRow(
+          column(5,
+            h4("The original set included 360 observation and 9 varibles.
+               51 models that did not include prices and two models that did not have fast charge were filtered out.
+               Makes with 10 or more models are highlighted in the visuals."),
+            h4('The continuous variables included in the dataset are the following:'),
+            h5("Battery: The capacity of the vehicle's battery in kilowatt-hours (kWh)"),
+            h5("Efficiency: The energy efficiency rating of the vehicle in watt-hours per kilometer (Wh/km)."),
+            h5("Fast_charge: The fast-charging capability of the vehicle in minutes for a certain charging percentage."),
+            h5("Price: The price of the electric vehicle in Germany in euros."),
+            h5("Range: The driving range of the vehicle on a single charge in kilometers."),
+            h5("Top_speed: The maximum speed the vehicle can achieve in kilometers per hour."),
+            h5("Acceleration: The acceleration time(s) from 0 to 100 kilometers per hour.")
+                 ),
+          column(7,
+           plotOutput("features")
+                 )
+                )           
+             ),
+      tabPanel('Electric Model Features',
+               fluidRow(
+                 column(9,
+                      h4('Choose the feature of the data set you would like to explore.')
+                        ),
+                 column(1),
+                 column(2, 
+                  varSelectInput("var", 
+                                 "Feature", 
+                                 ecars[,4:10], 
+                                 selected = "Price")
+                  
+                 )
+               ),
+               fluidRow(
+                 column(6,
+                        plotOutput("box")
+                 ),
+                 column(6,
+                        plotOutput("box2")
+                 )
+               ),
+               fluidRow(
+                 column(12, '     ')
+               ),
+               fluidRow(
+                 column(6, 
+                        plotOutput("hist")
+                        ),
+                 column(6,
+                        plotOutput("bar")
+                 )
+               )
               ),
+      tabPanel("Compare the Features",
+        fluidRow(
+          column(2, 
+            tags$label(h3('Select Variables')),
+            varSelectInput("xvar", 
+                           "X variable", 
+                           ecars_vars, 
+                           selected = "Battery"),
+            varSelectInput("yvar", 
+                           "Y variable", 
+                           ecars_vars, 
+                           selected = "Price")
+            ),
+          column(8,
+                 tags$label(h4('The visual below allows comparison of 
+                          the quantitative variables from the dataset. 
+                          Only data from car makes that have 10+ models is 
+                          displayed.')),
+                 plotOutput("scatter")
+                 ),
+          column(2, 
+            checkboxGroupInput("make", "Filter by Make",
+                                choices = unique(ecars_make$Make), 
+                                selected = unique(ecars_make$Make)),
+            hr(), # Add a horizontal rule
+            checkboxInput("by_make", "Show Make", TRUE),
+            checkboxInput("smooth", "Add Smoother")
+            )
+          )
+        )
+      ),
     tabPanel('Linear Model and Predictor',
         headerPanel('Price Predictor'),
         sidebarPanel(
           tags$label(h3('Input parameters')),
             numericInput("eff", 
-                          label = "Efficiency", 
+                          label = "Efficiency (Wh/km)", 
                           value = 200),
             numericInput("fc", 
-                          label = "Fast Charge", 
+                          label = "Fast Charge (minutes)", 
                           value = 500),
             numericInput("range", 
-                          label = "Range", 
+                          label = "Range (km)", 
                           value = 350),
             numericInput('ts', 
-                          label = "Top Speed", 
+                          label = "Top Speed (km/hr)", 
                           value = 150),
             numericInput('acc', 
-                         label = "Acceleration", 
+                         label = "Acceleration (s to 100 km/hr)", 
                          value = 6),
             numericInput('ap', 
-                         label = "Price", 
+                         label = "Price (euros)", 
                          value = 50000),
             actionButton("submitbutton",
                          "Submit", 
                           class = "btn btn-primary \n"),
             sliderInput('xlab', 'x zoom', 0, 500, 150, ticks = TRUE),
-            sliderInput('ylab', 'y zoom', 0, 500, 150, ticks = TRUE)
-                        ),
+            sliderInput('ylab', 'y zoom', 0, 500, 150, ticks = TRUE),
+                        width = 3),
         mainPanel(
             tags$label(h3('Predicted price in euros based on linear model')),
             tags$label(h4('Input the required fields for an electric vehicle. 

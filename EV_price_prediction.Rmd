@@ -17,6 +17,7 @@ library(repr)
 library(pals)
 ```
 ```{r}
+getwd()
 ecars_raw = read.csv('EV_cars.csv')
 
 ```
@@ -51,7 +52,6 @@ ecars_missing_price = ecars_raw %>% filter(is.na(Price))
 write.csv(ecars,file='/Users/Natalie/git_proj/Is-your-electric-car-overpriced-/ecars.csv', row.names=FALSE)
 write.csv(most_makes,file='/Users/Natalie/git_proj/Is-your-electric-car-overpriced-/most_makes.csv', row.names=FALSE)
 
-getwd()
 ```
 ```{r}
 make_colors = c('#e6194b', '#f58231',  '#ffe119', 
@@ -65,6 +65,9 @@ make_colors = c('#e6194b', '#f58231',  '#ffe119',
 price_model_empty = lm(Price ~ 1, data = ecars)
 price_model_full= lm(Price ~ Battery + Efficiency + Fast_charge + Range + Top_speed + Acceleration, data = ecars)
 summary(price_model_full)
+```
+```{r}
+ecars_missing_price
 ```
 
 ```{r}
@@ -226,11 +229,12 @@ predicted_missing_price %>%
 
 ```{r}
 summary(price_model)
+plot(price_model)
 saveRDS(price_model, "model.rds")
 ```
 
 ```{r}
-                                                                   
+                                                                 
 ```
 
 ```{r}

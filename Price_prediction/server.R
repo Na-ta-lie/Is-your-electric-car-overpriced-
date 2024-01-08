@@ -13,6 +13,62 @@ library(shiny)
 
 
 server <- function(input, output, session) {
+  
+  kaggle_url = a("Electric Vehicle Specifications and Prices", 
+                 href="https://www.kaggle.com/datasets/fatihilhan/electric-vehicle-specifications-and-prices/")
+  
+  output$tab1 <- renderUI({
+    tagList("Kaggle:", kaggle_url)
+  })
+  
+  output$features <- renderPlot({
+    plot(ecars[,4:10], 
+         main = 'Comparison of all Quantitive Features')  
+  })
+  
+  output$box <- renderPlot({
+    ggplot(ecars, aes(!!input$var, y = factor(0))) +
+      geom_boxplot()+
+      theme(axis.title.y=element_blank(),
+            axis.text.y=element_blank(),
+            axis.ticks.y=element_blank()) +
+      ggtitle('Box Plot of Selected Feature')  
+  })
+  
+  output$box2 <- renderPlot({
+    ggplot(ecars_make, aes(!!input$var, Make, fill = Make)) +
+      scale_fill_manual(values = make_colors) +
+      geom_boxplot(outlier.colour="black", 
+                   outlier.shape=16, 
+                   outlier.size=2, 
+                   notch=FALSE) +
+      theme(legend.position = "none") +
+      ggtitle('Box Plots of Selected Feature by Makes with 10 or More Models')  
+  })
+  
+  output$hist <- renderPlot({
+    ggplot(ecars, aes(x=!!input$var)) + 
+      geom_histogram(color="black", fill="white")+
+      ggtitle('Distribution of Selected Feature')  
+    
+  })
+  
+  output$bar <- renderPlot({
+  ecars %>% group_by(Make) %>%
+    filter(n() >= 10) %>%
+    summarise(feature = (mean(!!input$var))) %>%
+    ggplot(., aes(x = Make, y = feature, fill = Make, label = Make)) +
+    geom_bar(stat = 'identity') +
+    scale_fill_manual(values = make_colors) +
+    ylab('Mean')+
+    theme(axis.title.x=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank()) +
+    geom_text(angle = 90, position = position_stack(vjust = 0.5)) + 
+    theme(legend.position = "none")+
+    ggtitle('Mean of Selected Feature for each Make with 10 or More Models')  
+  })
+  
   subsetted <- reactive({
     req(input$make)
     ecars |> filter(Make %in% input$make)
@@ -138,7 +194,7 @@ server <- function(input, output, session) {
       xlab("Predicted Price (euros in thousands)") + ylab("Price (euros in thousands)") +
       ggtitle('Predicted Price vs. Price for each Make with 10+ Models (mean of price of all models)')  
     
-    
+
     
   })
 }
