@@ -1,12 +1,21 @@
 ---
 title: "EV_MLR"
-output: ioslides_presentation: theme: darkly
+output: ioslides_presentation
 date: "2024-01-08"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 library(bslib)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(car)
+library(MASS)
+library(repr)
+library(pals)
+library(ggpubr)
+library(plotly)
 ```
 
 ## R Markdown
