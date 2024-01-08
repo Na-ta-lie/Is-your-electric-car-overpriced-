@@ -1,0 +1,12 @@
+name: Electric_Vehicle_MLR_Price_Predictor
+title: Electric_Vehicle_MLR_Price_Predictor
+username: na-ta-lie
+account: na-ta-lie
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 10883392
+bundleId: 8120377
+url: https://na-ta-lie.shinyapps.io/Electric_Vehicle_MLR_Price_Predictor/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

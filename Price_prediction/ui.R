@@ -115,7 +115,29 @@ fluidPage(theme = shinytheme("united"),
           )
         )
       ),
-    tabPanel('Linear Model and Predictor',
+    navbarMenu("Linear Model",
+      tabPanel("About the Linear Model",
+          fluidRow(
+            tags$label(h3('This multiple linear regression uses all the quantititive varaibles from
+                          the data set except Battery, which was eliminated using an AIC. The Price was 
+                          transformed using a BoxCox transformation. I used the linear model to predict the prices of 
+                          the vehicles in the data set. I then plotted the predicted price against the actual
+                          price to easily visualize which vehicles cost more vs. less than predicted.')),
+            tags$label(h4('The blue line indicates the predicted price for all 
+                          vehicles in the data set. The black dashed lines indicate  
+                          the confidence interval and the the red dashed lines indicate 
+                          the prediction interval.')),
+            tags$label(h4('Hover over any point to see the make and model of the car.'))
+          ),
+          fluidRow(
+          column(2,
+                 sliderInput('xzoom', 'x zoom', 0, 300, 250, ticks = TRUE),
+                 sliderInput('yzoom', 'y zoom', 0, 300, 250, ticks = TRUE)),
+          column(10,
+              plotlyOutput('MLR'))
+                  )
+               ),
+      tabPanel('Price Predictor',
         headerPanel('Price Predictor'),
         sidebarPanel(
           tags$label(h3('Input parameters')),
@@ -162,7 +184,7 @@ fluidPage(theme = shinytheme("united"),
             plotOutput('predicted_mean')
             )
           )
-        
+        )
       )
     )
 

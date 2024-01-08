@@ -16,7 +16,7 @@ library(MASS)
 library(repr)
 library(pals)
 library(ggpubr)
-install.packages('plotly')
+library(plotly)
 
 ```
 ```{r}
@@ -79,15 +79,30 @@ make_other = sort(make_other)
 make_other[15] = 'Other'
 make_other
 ```
-
 ```{r}
-ggplot(ecars, aes(x = Battery, y = Price)) +
+ggplot(ecars, aes(x = Battery, y = Price, text = Car_name)) +
   geom_point(aes(col = Make2)) + 
   scale_color_manual(name = "Make", values = make_colors2, labels = make_other)+
   xlab("Battery Capacity (kWh)") + 
   ylab("Price in Germany (euros) ") +
   ggtitle('Electric Vehicle Battery vs. Price (Makes with 10+ Models Highlighted)') +
   theme(legend.position = "bottom")
+```
+
+```{r}
+test = ggplot(ecars, aes(x = Battery, y = Price, text = Car_name)) +
+  geom_point(aes(col = Make2)) + 
+  scale_color_manual(name = "Make", values = make_colors2, labels = make_other)+
+  xlab("Battery Capacity (kWh)") + 
+  ylab("Price in Germany (euros) ") +
+  ggtitle('Electric Vehicle Battery vs. Price (Makes with 10+ Models Highlighted)') +
+  theme(legend.position = "none")
+
+test
+
+ggplotly(test, tooltip = c("x", 'y', "text")) 
+
+
 ```
 
 ```{r}

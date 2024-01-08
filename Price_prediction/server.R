@@ -82,10 +82,37 @@ server <- function(input, output, session) {
       geom_point(), 
       if (input$smooth) geom_smooth()
     )
+    
     p
+    
   }, res = 100)
   
 
+  
+  output$MLR <- renderPlotly({
+    mlr = ggplot(NULL, aes(Predicted_price, Price)) +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predicted), 
+                  col = 'blue', size = .8, alpha = .5) +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_lwr), 
+                  col = 'red', linetype = 'dashed', size = .8, alpha = .8) +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_upr), 
+                  col = 'red', linetype = 'dashed',size = .8, alpha = .8) +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_lwr), 
+                  col = 'black', linetype = 'dashed', size = .8, alpha = .8) +
+      geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_upr), 
+                  col = 'black', linetype = 'dashed', size = .8, alpha = .8) +
+      geom_point(data = predicted_price, aes(x = Predicted, y = Price, text = Name), alpha = .5) +
+      theme(legend.position = "right", legend.text = element_text(size = 8))+
+      ylim(25, input$yzoom) + xlim(25, input$xzoom) +
+      labs(title = "Predicted Price vs. Price for all EV Models",
+           caption = "Data source: ToothGrowth",
+           x = "Predicted price (euros in thousands)", y = "German Price (euros in thousands)",
+           tag = "A")
+    
+    ggplotly(mlr, tooltip = c("x", 'y', "text")) 
+  })
+  
+  
   
   datasetInput <- reactive({  
     
