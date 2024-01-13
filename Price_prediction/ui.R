@@ -8,11 +8,12 @@
 #
 
 library(shiny)
+library(bslib)
 
 # Define UI for application that draws a histogram
 
 
-fluidPage(theme = shinytheme("united"),
+fluidPage(theme = shinytheme('darkly'),
   navbarPage("Is Your Electric Car Overpriced?",
     tabPanel('Welcome!',
             h2("Welcome to the Electric Car Price Predictor!", 
@@ -57,19 +58,19 @@ fluidPage(theme = shinytheme("united"),
                         ),
                  column(1),
                  column(2, 
-                  varSelectInput("var", 
-                                 "Feature", 
-                                 ecars[,4:10], 
-                                 selected = "Price")
+                 varSelectInput("var", 
+                                "Feature", 
+                                ecars[,4:10], 
+                                selected = "Price")
                   
                  )
                ),
                fluidRow(
                  column(6,
-                        plotOutput("box")
+                        plotlyOutput("box")
                  ),
                  column(6,
-                        plotOutput("box2")
+                        plotlyOutput("box2")
                  )
                ),
                fluidRow(
@@ -138,7 +139,8 @@ fluidPage(theme = shinytheme("united"),
                   )
                ),
       tabPanel('Price Predictor',
-        sidebarPanel(
+        fluidRow(
+        column(3,
           tags$label(h3('Input parameters')),
             numericInput("eff", 
                           label = "Efficiency (Wh/km)", 
@@ -162,9 +164,9 @@ fluidPage(theme = shinytheme("united"),
                          "Submit", 
                           class = "btn btn-primary \n"),
             sliderInput('xlab', 'x zoom', 0, 500, 150, ticks = TRUE),
-            sliderInput('ylab', 'y zoom', 0, 500, 150, ticks = TRUE),
-                        width = 3),
-        mainPanel(
+            sliderInput('ylab', 'y zoom', 0, 500, 150, ticks = TRUE)
+        ),
+        column(9,
             tags$label(h3('Predict what the price (euros) of an electric car should be!')),
             tags$label(h4('Input the required fields for an electric vehicle. 
                           The model will predict its price using these fields. 
@@ -182,6 +184,7 @@ fluidPage(theme = shinytheme("united"),
             plotOutput('predicted'),
             plotOutput('predicted_mean')
             )
+           )
           )
         )
       )

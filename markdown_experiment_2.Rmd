@@ -1,6 +1,10 @@
 ---
 title: "Is Your Electric Vehicle Overpriced?"
-output: slidy_presentation
+author: "Natalie Stier"
+output: 
+  slidy_presentation:
+    css: bootstrap.min.css
+runtime: shiny
 date: "2024-01-08"
 ---
 
@@ -15,12 +19,15 @@ library(repr)
 library(pals)
 library(ggpubr)
 library(plotly)
+library(revealjs)
+library(shiny)
 knitr::opts_chunk$set(echo = FALSE)
 
 ecars <- read.csv("ecars.csv")
 
 top_10 = ecars %>% group_by(Make) %>%
   filter(n() >= 10)
+
 
 makes = top_10$Make 
 
@@ -48,7 +55,7 @@ I wanted to focus on linear regression.
 Electric cars are typically $6000 to $7000 more than their gas counterparts. So it is already more of an investment. 
 
 
-## The data set
+## The data set 
 
 This collection of data on electric vehicles came from Kaggle. The original set included 360 observations and 9 variables.
 
@@ -96,6 +103,7 @@ ggplotly(test, tooltip = c("x", 'y', "text"))
 ## Page plot
 <div style= "float:right;position: relative; top: -80px;">
 
+
 ```{r}
 a = ggplot(ecars, aes(x = Battery, y = Price, text = Car_name)) +
   geom_point(aes(col = Make2)) + 
@@ -126,3 +134,68 @@ the is a linear model
 hello 
 why are we doing this this is thisfijdfsdf
 fjsdlkfhelel adfalehffe hhfjdhf 
+HIIIIII
+
+
+## Shiny
+
+```{r}
+inputPanel(
+  varSelectInput("var", 
+                 "Feature", 
+                 ecars[,4:10], 
+                 selected = "Price")
+  )
+
+
+output$p1 <- renderPlot({
+  ggplot(top_10, aes(!!input$var, y = factor(0))) +
+      geom_boxplot()+
+      theme(axis.title.y=element_blank(),
+            axis.text.y=element_blank(),
+            axis.ticks.y=element_blank()) +
+      ggtitle('Box Plot of Selected Feature') 
+})
+
+output$p2 <- renderPlot({
+  ggplot(top_10, aes(!!input$var, Make, fill = Make)) +
+      scale_fill_manual(values = make_colors) +
+      geom_boxplot(outlier.colour="black", 
+                   outlier.shape=16, 
+                   outlier.size=2, 
+                   notch=FALSE) +
+      theme(legend.position = "none") +
+      ggtitle('Box Plots of Selected Feature by Makes with 10 or More Models')
+})
+
+column(6,
+plotOutput('p1', width = '600px')
+)
+
+column(6,
+plotOutput('p2', width = '600px')
+)
+```
+
+
+## another
+```{r}
+
+ 
+column(2, 
+    varSelectInput("var", 
+                   "Feature", 
+                   ecars[,4:10], 
+                   selected = "Price")
+    
+   )
+column(6,
+          plotOutput("box")
+   )
+column(6,
+          plotOutput("box2")
+)
+ 
+```
+
+

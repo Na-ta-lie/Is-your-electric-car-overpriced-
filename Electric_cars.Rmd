@@ -29,9 +29,9 @@ library(tidyr)
 library(car)
 library(MASS)
 library(repr)
-install.packages('pals')
+
 library(pals)
-install.packages('broom')
+
 ```
 
 
@@ -96,7 +96,7 @@ Noecars = ecars
 
 Noecars$Make2 = Noecars$Make
 Noecars
-makes = most_makes$Make
+makes = top_10$Make
 makes
 Noecars$Make3 = ifelse(Noecars$Make2 %in% makes, Noecars$Make2, "Other")
 Noecars$Make2 %in% makes
@@ -355,8 +355,13 @@ most_makes = test2_2_dollarsnew %>% group_by(Make) %>%
 ```
 
 ```{r}
-ecars
-
+test = ggplot(ecars, aes(x = Price, y = factor(0))) +
+      geom_boxplot()+
+      theme(axis.title.y=element_blank(),
+            axis.text.y=element_blank(),
+            axis.ticks.y=element_blank()) +
+      ggtitle('Box Plot of Selected Feature') 
+test
 ```
 
 
@@ -399,13 +404,7 @@ test2_2_dollarsnew %>%
 ```
 ```{r}
 ecars
-plot_ly(
-  data = ecars_make,
-  x = ~Price,
-  type = "box",
-  text = ~Car_name,
-  tooltip = c("x", "text")
-)
+
 
 plot_ly(
   data = ecars_make,
@@ -418,6 +417,21 @@ plot_ly(
   tooltip = c("x", "text"),
   showlegend = FALSE
 )
+
+
+plot_ly(
+  data = ecars_make,
+  x = ~Price,
+  type = "box",
+  text = ~Car_name,
+  name = '',
+  tooltip = c("x", "text"))%>% 
+  layout(title = "Box Plot of Selected Feature",
+         yaxis = list(title = ''),
+         xaxis = list(title = ''))
+```
+```{r}
+ecars[,5]
 ```
 
 ```{r}

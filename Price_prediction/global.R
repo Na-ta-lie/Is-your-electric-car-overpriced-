@@ -7,6 +7,7 @@ library(repr)
 library(pals)
 library(shinythemes)
 library(plotly)
+library(bslib)
 
 ecars = read.csv('ecars.csv')
 ecars_vars = ecars[,4:10]

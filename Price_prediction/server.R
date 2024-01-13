@@ -7,6 +7,7 @@
 #    http://shiny.rstudio.com/
 #
 
+
 library(shiny)
 
 # Define server logic required to draw a histogram
@@ -26,47 +27,63 @@ server <- function(input, output, session) {
          main = 'Comparison of all Quantitive Features')  
   })
   
-  #boxvar <- reactive({
-  #  !!input$var
-  #  })
-  #  
   
-  output$box <- renderPlot({
+  output$box <- renderPlotly({
   
-    #plot_ly(
-    #  data = ecars,
-    #  x = ~boxvar,
-    #  type = "box",
-    #  text = ~Car_name,
-    #  tooltip = c("x", "text")
-    #)
+    plot_ly(
+      data = ecars,
+      x = ~get(input$var),
+      type = "box",
+      text = ~Car_name,
+      name = ' ',
+      tooltip = c("x", "text")) %>% 
+      layout(title = "Box Plot of Selected Feature",
+             yaxis = list(title = ''),
+             xaxis = list(title = ''))
+      
     
-    ggplot(ecars, aes(!!input$var, y = factor(0))) +
-      geom_boxplot()+
-      theme(axis.title.y=element_blank(),
-            axis.text.y=element_blank(),
-            axis.ticks.y=element_blank()) +
-      ggtitle('Box Plot of Selected Feature')  
-    
+    #ggplot(ecars, aes(!!input$var, y = factor(0))) +
+    #  geom_boxplot()+
+    #  theme(axis.title.y=element_blank(),
+    #        axis.text.y=element_blank(),
+    #        axis.ticks.y=element_blank()) +
+    #  ggtitle('Box Plot of Selected Feature')  
+    #
     #ggplotly(p2, x = !!input$var)
   })
   
-  output$box2 <- renderPlot({
-    ggplot(ecars_make, aes(!!input$var, Make, fill = Make)) +
-      scale_fill_manual(values = make_colors) +
-      geom_boxplot(outlier.colour="black", 
-                   outlier.shape=16, 
-                   outlier.size=2, 
-                   notch=FALSE) +
-      theme(legend.position = "none") +
-      ggtitle('Box Plots of Selected Feature by Makes with 10 or More Models') 
+  output$box2 <- renderPlotly({
+    
+    plot_ly(
+      data = ecars_make,
+      x = ~get(input$var),
+      y = ~Make,
+      type = "box",
+      color = ~Make,
+      colors = make_colors,
+      text = ~Car_name,
+      tooltip = c("x", "text"),
+      showlegend = FALSE
+    )%>% 
+      layout(title = "Box Plots of Selected Feature by Makes with 10 or More Models",
+             yaxis = list(title = ''),
+             xaxis = list(title = ''))
+    
+    #ggplot(ecars_make, aes(!!input$var, Make, fill = Make)) +
+    #  scale_fill_manual(values = make_colors) +
+    #  geom_boxplot(outlier.colour="black", 
+    #               outlier.shape=16, 
+    #               outlier.size=2, 
+    #               notch=FALSE) +
+    #  theme(legend.position = "none") +
+    #  ggtitle('Box Plots of Selected Feature by Makes with 10 or More Models') 
     
     
   })
   
   output$hist <- renderPlot({
     ggplot(ecars, aes(x=!!input$var)) + 
-      geom_histogram(color="black", fill="white")+
+      geom_histogram(color="black", fill="white", bins = 10)+
       ggtitle('Distribution of Selected Feature')  
     
   })
@@ -88,7 +105,7 @@ server <- function(input, output, session) {
   })
   
   subsetted <- reactive({
-    req(input$make)
+    req(input$var)
     ecars |> filter(Make %in% input$make)
   })
   

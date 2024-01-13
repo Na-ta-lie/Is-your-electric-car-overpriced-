@@ -1,0 +1,197 @@
+---
+title: "Is Your Electric Vehicle Overpriced?"
+author: "Natalie Stier"
+output: 
+  slidy_presentation:
+    css: bootstrap.min.css
+runtime: shiny
+date: "2024-01-08"
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(car)
+library(MASS)
+library(repr)
+library(pals)
+library(shinythemes)
+library(plotly)
+library(bslib)
+library(ggpubr)
+library(revealjs)
+library(shiny)
+
+ecars = read.csv('ecars.csv')
+ecars_vars = ecars[,4:10]
+ecars_make  = ecars %>% group_by(Make) %>%
+  filter(n()>=10)
+most_makes = read.csv('most_makes.csv')
+predicted_price = read.csv('predicted_price.csv')
+
+makes = most_makes$Make 
+
+ecars$Make2 = ifelse(ecars$Make %in% makes, ecars$Make, "zOther")
+make_other = unique(ecars$Make2)
+make_other = sort(make_other)
+make_other[15] = 'Other'
+
+price_model_initial = lm(Price ~ Efficiency + Fast_charge + 
+                        Range + Top_speed + 
+                        Acceleration, data = ecars)
+bc = boxCox(price_model_initial)
+lambda = bc$x[which(bc$y == max(bc$y))]
+
+model <- readRDS("model.rds")
+
+             
+make_colors = c('#e6194b', '#f58231',  '#ffe119', 
+                '#bcf60c','#3cb44b', '#008080',
+                '#aaffc3', '#4363d8', '#000075',
+                '#46f0f0', '#911eb4', '#e6beff',
+                '#f032e6', '#fabebe')
+              
+
+make_colors2 = c('#e6194b', '#f58231',  '#ffe119', 
+                '#bcf60c','#3cb44b', '#008080',
+                '#aaffc3', '#4363d8', '#000075',
+                '#46f0f0', '#911eb4', '#e6beff',
+                '#f032e6', '#fabebe', 'black')
+
+#shiny plot outputs 
+
+# box plot of any variable 
+ output$p1 <- renderPlot({
+  
+    ggplot(ecars, aes(!!input$var, y = factor(0))) +
+      geom_boxplot()+
+      theme(axis.title.y=element_blank(),
+            axis.text.y=element_blank(),
+            axis.ticks.y=element_blank()) +
+      ggtitle('Box Plot of Selected Feature')  
+    
+  })
+  
+#boxplot of any variable by Make
+  output$p2 <- renderPlot({
+    ggplot(ecars_make, aes(!!input$var, Make, fill = Make)) +
+      scale_fill_manual(values = make_colors) +
+      geom_boxplot(outlier.colour="black", 
+                   outlier.shape=16, 
+                   outlier.size=2, 
+                   notch=FALSE) +
+      theme(legend.position = "none") +
+      ggtitle('Box Plots of Selected Feature by Makes with 10 or More Models') 
+    
+    
+  })
+  
+output$p1a <- renderPlotly({
+  plot_ly(
+  data = ecars_make,
+  x = ~Price,
+  type = "box",
+  text = ~Car_name,
+  tooltip = c("x", "text")
+)
+})
+  
+#histogram of variable  
+ output$p3 <- renderPlot({
+    ggplot(ecars, aes(x=!!input$var)) + 
+      geom_histogram(color="black", fill="white")+
+      ggtitle('Distribution of Selected Feature')  
+    
+  })
+
+# bar graph of variable 
+  output$p4 <- renderPlot({
+  ecars %>% group_by(Make) %>%
+    filter(n() >= 10) %>%
+    summarise(feature = (mean(!!input$var))) %>%
+    ggplot(., aes(x = Make, y = feature, fill = Make, label = Make)) +
+    geom_bar(stat = 'identity') +
+    scale_fill_manual(values = make_colors) +
+    ylab('Mean')+
+    theme(axis.title.x=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank()) +
+    geom_text(angle = 90, position = position_stack(vjust = 0.5)) + 
+    theme(legend.position = "none")+
+    ggtitle('Mean of Selected Feature for each Make with 10 or More Models')  
+  })
+
+```
+
+## Background Information and Research Question:
+
+I wanted to focus on linear regression. 
+Electric cars are typically $6000 to $7000 more than their gas counterparts. So it is already more of an investment. 
+
+
+## The data set 
+
+This collection of data on electric vehicles came from Kaggle. The original set included 360 observations and 9 variables.
+
+https://www.kaggle.com/datasets/fatihilhan/electric-vehicle-specifications-and-prices/ 
+
+Data Fields:
+Battery: The capacity of the vehicle's battery in kilowatt-hours (kWh).
+Car_name: The model name of the electric vehicle.
+Car_name_link: A direct link to the corresponding page on EV Database for more in-depth information.
+Efficiency: The energy efficiency rating of the vehicle in watt-hours per kilometer (Wh/km).
+Fast_charge: The fast-charging capability of the vehicle in minutes for a certain charging percentage.
+Price.DE.: The price of the electric vehicle in Germany.
+Range: The driving range of the vehicle on a single charge in kilometers.
+Top_speed: The maximum speed the vehicle can achieve in kilometers per hour.
+Acceleration..0.100.: The acceleration time from 0 to 100 kilometers per hour.
+
+## Qualitative Variable included in the data set. 
+
+```{r, echo = FALSE}
+plot(ecars[,4:10])
+```
+
+## Investigate variables
+```{r, echo = FALSE}
+inputPanel(
+  varSelectInput("var", 
+                 "Feature", 
+                 ecars[,4:10], 
+                 selected = "Price")
+  )
+
+column(6,
+plotOutput('p1', width = '600px')
+)
+
+column(6,
+plotOutput('p2', width = '600px')
+)
+
+```
+
+## test
+```{r, echo = FALSE}
+
+plotlyOutput('p1a')
+```
+
+
+## Slide with Plot
+
+```{r, echo = FALSE}
+
+test = ggplot(ecars, aes(x = Battery, y = Price, text = Car_name)) +
+  geom_point(aes(col = Make2)) + 
+  scale_color_manual(name = "Make", values = make_colors2, labels = make_other)+
+  xlab("Battery Capacity (kWh)") + 
+  ylab("Price in Germany (euros) ") +
+  ggtitle('Electric Vehicle Battery vs. Price (Makes with 10+ Models Highlighted)') +
+  theme(legend.position = "none")
+
+
+ggplotly(test, tooltip = c("x", 'y', "text")) 
+```
+
