@@ -93,14 +93,19 @@ make_other
       tooltip = c("x", "text"),
       showlegend = FALSE
               )%>% 
-      layout(title = "Box Plots of Selected Feature by Makes with 10 or More Models",
+      layout(title = "Selected Feature (Makes with 10 + Models)",
              yaxis = list(title = ''),
              xaxis = list(title = ''))
     
   })
   
 
-  
+ output$histogram <- renderPlot({
+    ggplot(ecars, aes(x=!!input$var)) + 
+      geom_histogram(color="black", fill="white", bins = 15)+
+      ggtitle('Distribution of Selected Feature')+ theme(plot.title = element_text(size=18))  
+    
+  })  
 #histogram of variable  
  
 # bar graph of variable 
@@ -122,17 +127,16 @@ I wanted to work with a data set lending itself to a multiple linear regression.
 
 According to [Autoweek](https://www.autoweek.com/news/a44900159/are-electric-cars-worth-it/) electric cars are typically $6000 to $7000 more than their gas counterparts:
 
-> Some electric cars are the same or less money than their gas counterparts,  
-> but others are much more expensive.  
-> It all depends on the car, the price of electricity,  
-> the rate of depreciation, if you're eligible for any incentives, and much more.
+> Some electric cars are the same or less money than their gas counterparts, but others are much more expensive.  
+> It all depends on the car, the price of electricity, the rate of depreciation, if you're eligible for any incentives, and much more.
 
 **The more you know about your investment the better.** 
 
 ## The data set 
 
-This collection of data on electric vehicles came from [Kaggle](https://www.kaggle.com/datasets/fatihilhan/electric-vehicle-specifications-and-prices/). The original set included 360 observations and 9 variables.
-
+This collection of data on electric vehicles came from [Kaggle](https://www.kaggle.com/datasets/fatihilhan/electric-vehicle-specifications-and-prices/). The original set included 360 observations and 9 variables.  
+  
+  
 **Variables**
 
 * Battery: The capacity of the vehicle's battery in kilowatt-hours (kWh).
@@ -145,22 +149,23 @@ This collection of data on electric vehicles came from [Kaggle](https://www.kagg
 * Top_speed: The maximum speed the vehicle can achieve in kilometers per hour.
 * Acceleration..0.100.: The acceleration time from 0 to 100 kilometers per hour.
 
-## Processing and Qualitative Variables  
+## Data Processing and Variables  
 <div style= "float:right;position: relative; top: 0px;">
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.dim = c(9, 7) }
 plot(ecars[,4:10],
      main = 'Comparison of all Quantitive Features')
+
 ```
 </div>
 1. I created a Make variable by extracting the first word from the Car_name variable. 
-2. I also renamed several columns to make them more intuitive for example acceleration..0.100. to Acceleration.
-3. I removed the two cars that did not have Fast Charge (the Renault Twingo Electric and the e.Go e.wave X) capability because this was an important feature in the linear regression and was impacting their price. 
-4. I split the dataframe into two. One with prices(307 objects) and one with missing prices (51 objects). 
+2. I also renamed several columns to make them more intuitive for example I changed acceleration..0.100. to Acceleration.
+3. I removed the two cars that did not have fast charge capability (the Renault Twingo Electric and the e.Go e.wave X) because this was an important feature in the linear regression and was impacting their price. 
+4. I split the dataframe into two. A dataframe containing cars with prices called ecars (307 objects), and one containing cars missing prices called ecars_missing_price (51 objects). 
 
 After cleaning the data 45 unique car makes were included in the ecars data used to create the linear model and 22 unique car makes were included in the data with missing prices. Additionally 14 makes that have 10 or more car models are highlighted throughout the project.
 
-## Investigate variables
+## Quantitative variables
 
 ```{r, echo = FALSE}
 inputPanel(
@@ -170,56 +175,22 @@ inputPanel(
                  selected = "Price")
   )
 
-column(6,
-plotlyOutput('p1', width = '625px', height = '550px')
+column(4,
+plotlyOutput('p1', width = '500px', height = '550px')
 )
 
-column(6,
-plotlyOutput('p2', width = '625px', height = '550px')
+column(4,
+plotlyOutput('p2', width = '500px', height = '550px')
 )
 
-```
-
-## Slide with Plot
-
-```{r, figures-side, fig.show="hold", out.width="50%", echo = FALSE}
-
- output$makescatter <- renderPlotly({
-
-test = ggplot(ecars, aes(x = Battery, y = Price, text = Car_name)) +
-  geom_point(aes(col = Make2)) + 
-  scale_color_manual(name = "Make", values = make_colors2, labels = make_other)+
-  xlab("Battery Capacity (kWh)") + 
-  ylab("Price in Germany (euros) ") +
-  ggtitle('Electric Vehicle Battery vs. Price (Makes with 10+ Models Highlighted)') +
-  theme(legend.position = "none")
-ggplotly(test, tooltip = c("x", 'y', "text")) 
- })
  
-output$barchart <- renderPlot({
-ecars %>% group_by(Make) %>%
-    filter(n() >= 10) %>%
-    summarise(feature = (mean(Price))) %>%
-    ggplot(., aes(x = Make, y = feature, fill = Make, label = Make)) +
-    geom_bar(stat = 'identity') +
-    scale_fill_manual(values = make_colors) +
-    ylab('Mean')+
-    theme(axis.title.x=element_blank(),
-          axis.text.x=element_blank(),
-          axis.ticks.x=element_blank()) +
-    geom_text(angle = 90, position = position_stack(vjust = 0.5)) + 
-    theme(legend.position = "none")+
-    ggtitle('Mean of Selected Feature for each Make with 10 or More Models')
-})
-
-column(8, plotlyOutput('makescatter', height = '650px'
-))
-column(4, plotOutput('barchart', height = '650px'
-))
+column(4, 
+       plotOutput('histogram', width = '500px', height = '550px')
+)
 
 ```
 
-## Interaction 
+## Quantitative Variable Relationships
 
 ```{r, echo = FALSE}
 column(2, 
@@ -264,17 +235,63 @@ output$scatter <- renderPlot({
   }, res = 100)
 
 ```
+## Top Speed vs. Price
 
-## Linear Model 
+Top speed is a fairly good predictor of price. 
 
-1. I started by making a linear model including all the continuous variables. 
-2. Using that model and an empty model I did an AIC which eliminated Battery. I expected either Battery or Range to be eliminated because of their co-linearity 
-3. Price did not have a normal distribution so I did a BoxCox transformation and then redid the model after transforming the price
-4. I also did some prior investigation by doing transformations to some of the other variables as well but got the best adjusted R-squared and lowest AIC with just the variables and the transformed price 
+```{r, figures-side, fig.show="hold", out.width="50%", echo = FALSE}
+
+ output$makescatter <- renderPlotly({
+
+test = ggplot(ecars, aes(x = Top_speed, y = Price, text = Car_name)) +
+  geom_point(aes(col = Make2)) + 
+  scale_color_manual(name = "Make", values = make_colors2, labels = make_other)+
+  xlab("Top Speed (km/hr)") + 
+  ylab("Price in Germany (euros) ") +
+  ggtitle('Electric Vehicle Battery vs. Price (Makes with 10+ Models Highlighted)') +
+  theme(legend.position = "none")
+ggplotly(test, tooltip = c("x", 'y', "text")) 
+ })
+ 
+output$barchart <- renderPlot({
+ecars %>% group_by(Make) %>%
+    filter(n() >= 10) %>%
+    summarise(feature = (mean(Price))) %>%
+    ggplot(., aes(x = Make, y = feature, fill = Make, label = Make)) +
+    geom_bar(stat = 'identity') +
+    scale_fill_manual(values = make_colors) +
+    ylab('Mean')+
+    theme(axis.title.x=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank()) +
+    geom_text(angle = 90, position = position_stack(vjust = 0.5)) + 
+    theme(legend.position = "none", plot.title = element_text(size=18))+
+    ggtitle('Mean Price for each Make with 10+ Models')
+})
+
+column(8, plotlyOutput('makescatter', height = '650px'
+))
+column(4, plotOutput('barchart', height = '650px'
+))
+
+```
 
 ```{r}
+lm_Price_TS = lm(Price ~ Top_speed, ecars)
+summary(lm_Price_TS)
+```
+
+## Linear Model 
+<div style= "float:right;position: relative; top: 0px;">
+
+```{r, echo = FALSE}
 summary(model)
 ```
+
+</div>
+1. I started by making a linear model including all the continuous variables. 
+2. Using that model and an empty model I did an AIC which eliminated Battery. I expected either Battery or Range to be eliminated because of their co-linearity. 
+3. Price is skewed right so I did a BoxCox transformation and then redid the model after transforming the price.
 
 ## Linear Model plotly
 
