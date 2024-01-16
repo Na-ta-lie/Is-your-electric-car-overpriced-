@@ -1,0 +1,12 @@
+name: slidy_presentation
+title: slidy_presentation
+username: na-ta-lie
+account: na-ta-lie
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 10942137
+bundleId: 8150893
+url: https://na-ta-lie.shinyapps.io/slidy_presentation/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

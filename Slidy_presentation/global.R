@@ -32,6 +32,10 @@ make_colors = c('#e6194b', '#f58231',  '#ffe119',
                 '#f032e6', '#fabebe')
 
 
-
+make_colors2 = c('#e6194b', '#f58231',  '#ffe119', 
+                 '#bcf60c','#3cb44b', '#008080',
+                 '#aaffc3', '#4363d8', '#89A8BF',
+                 '#46f0f0', '#911eb4', '#e6beff',
+                 '#f032e6', '#fabebe', 'black')
 
 

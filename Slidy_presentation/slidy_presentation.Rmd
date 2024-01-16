@@ -1,11 +1,30 @@
 ---
 title: "Is Your Electric Vehicle Overpriced?"
 author: "Natalie Stier"
-output: 
+date: "2024-01-08"
+output:
   slidy_presentation:
     css: bootstrap.min.css
 runtime: shiny
-date: "2024-01-08"
+resource_files:
+- bootstrap.min.css
+- ecars.csv
+- model.rds
+- global.R
+- most_makes.csv
+- predicted_price.csv
+- bootstrap.min.css
+- ecars.csv
+- global.R
+- model.rds
+- most_makes.csv
+- predicted_price.csv
+- bootstrap.min.css
+- ecars.csv
+- global.R
+- model.rds
+- most_makes.csv
+- predicted_price.csv
 ---
 
 ```{r setup, include=FALSE}
@@ -22,6 +41,8 @@ library(bslib)
 library(ggpubr)
 library(revealjs)
 library(shiny)
+library(extrafont)
+
 
 ecars = read.csv('ecars.csv')
 ecars_vars = ecars[,4:10]
@@ -44,18 +65,17 @@ bc = boxCox(price_model_initial)
 lambda = bc$x[which(bc$y == max(bc$y))]
 
 model <- readRDS("model.rds")
-
              
 make_colors = c('#e6194b', '#f58231',  '#ffe119', 
                 '#bcf60c','#3cb44b', '#008080',
-                '#aaffc3', '#4363d8', '#000075',
+                '#aaffc3', '#4363d8', '#89A8BF',
                 '#46f0f0', '#911eb4', '#e6beff',
                 '#f032e6', '#fabebe')
               
 
 make_colors2 = c('#e6194b', '#f58231',  '#ffe119', 
                 '#bcf60c','#3cb44b', '#008080',
-                '#aaffc3', '#4363d8', '#000075',
+                '#aaffc3', '#4363d8', '#89A8BF',
                 '#46f0f0', '#911eb4', '#e6beff',
                 '#f032e6', '#fabebe', 'black')
 
@@ -63,10 +83,70 @@ make_other = unique(ecars$Make2)
 make_other = sort(make_other)
 make_other[15] = 'Other'
 make_other
-#shiny plot outputs 
 
-# box plot of any variable 
- output$p1 <- renderPlotly({
+```
+
+## Research Question and Background Information:
+
+-   Research Question:
+
+Based on an electric model's features what should its price be?
+
+-   Why Electric Cars?
+
+I wanted to work with a data set lending itself to a multiple linear regression.
+
+According to [Autoweek](https://www.autoweek.com/news/a44900159/are-electric-cars-worth-it/) electric cars are typically \$6000 to \$7000 more than their gas counterparts:
+
+> Some electric cars are the same or less money than their gas counterparts, but others are much more expensive.\
+> It all depends on the car, the price of electricity, the rate of depreciation, if you're eligible for any incentives, and much more.
+
+**The more you know about your investment the better.**
+
+## The Data Set
+
+This collection of data on electric vehicles came from [Kaggle](https://www.kaggle.com/datasets/fatihilhan/electric-vehicle-specifications-and-prices/). The original set included 360 observations and 9 variables.
+
+**Variables**
+
+-   Battery: The capacity of the vehicle's battery in kilowatt-hours (kWh).
+-   Car_name: The model name of the electric vehicle.
+-   Car_name_link: A direct link to the corresponding page on EV Database for more in-depth information.
+-   Efficiency: The energy efficiency rating of the vehicle in watt-hours per kilometer (Wh/km).
+-   Fast_charge: The fast-charging capability of the vehicle in minutes for a certain charging percentage.
+-   Price.DE.: The price of the electric vehicle in Germany.
+-   Range: The driving range of the vehicle on a single charge in kilometers.
+-   Top_speed: The maximum speed the vehicle can achieve in kilometers per hour.
+-   Acceleration..0.100.: The acceleration time from 0 to 100 kilometers per hour.
+
+## Data Processing and Variables
+
+<div style= "float:right;position: relative; top: 0px;">
+```{r, echo = FALSE, fig.dim = c(8, 6)}
+plot(ecars[,4:10],
+     main = 'Comparison of all Quantitive Features')
+
+```
+</div>
+
+1.  I created a Make variable by extracting the first word from the Car_name variable.
+2.  I also renamed several columns to make them more intuitive for example I changed acceleration..0.100. to Acceleration.
+3.  I split the dataframe into two. A dataframe containing cars with prices called ecars (307 objects), and one containing cars missing prices called ecars_missing_price (51 objects).
+4.  I removed the two cars that did not have fast charge capability (the Renault Twingo Electric and the e.Go e.wave X) because this was an important feature in the linear regression and was impacting their price.
+
+305 electric cars with 45 unique car makes were included in the ecars data used to create the linear model. Additionally 14 makes that have 10 or more car models are highlighted throughout the project.
+
+## Quantitative Variables
+
+```{r, echo = FALSE}
+inputPanel(
+  varSelectInput("var", 
+                 tags$span(style="color: #343a40; font-size: 24px;","Feature"), 
+                 ecars[,4:10], 
+                 selected = "Price")
+  )
+
+output$p1 <- renderPlotly({
   plot_ly(
       data = ecars,
       x = ~get(input$var),
@@ -79,8 +159,10 @@ make_other
              xaxis = list(title = ''))
    
   })
-  
-#boxplot of any variable by Make
+column(4,
+plotlyOutput('p1', width = '420px', height = '500px')
+)
+
   output$p2 <- renderPlotly({
      plot_ly(
       data = ecars_make,
@@ -98,94 +180,22 @@ make_other
              xaxis = list(title = ''))
     
   })
-  
 
+column(4,
+plotlyOutput('p2', width = '420px', height = '500px')
+)
+  
  output$histogram <- renderPlot({
     ggplot(ecars, aes(x=!!input$var)) + 
       geom_histogram(color="black", fill="white", bins = 15)+
-      ggtitle('Distribution of Selected Feature')+ theme(plot.title = element_text(size=18))  
-    
+      ggtitle('Distribution of Selected Feature')+ 
+      theme(plot.title = element_text(size=18, family= "Verdana"),
+            axis.title = element_text(size = 14))  
+            
   })  
-#histogram of variable  
- 
-# bar graph of variable 
-
-
-# variable relationships 
-
-```
-
-## Background Information and Research Question:
-
-* Research Question
-
-Based on an electric model's features what should it's price be?
-
-* Why Electric Cars?
-
-I wanted to work with a data set lending itself to a multiple linear regression.
-
-According to [Autoweek](https://www.autoweek.com/news/a44900159/are-electric-cars-worth-it/) electric cars are typically $6000 to $7000 more than their gas counterparts:
-
-> Some electric cars are the same or less money than their gas counterparts, but others are much more expensive.  
-> It all depends on the car, the price of electricity, the rate of depreciation, if you're eligible for any incentives, and much more.
-
-**The more you know about your investment the better.** 
-
-## The data set 
-
-This collection of data on electric vehicles came from [Kaggle](https://www.kaggle.com/datasets/fatihilhan/electric-vehicle-specifications-and-prices/). The original set included 360 observations and 9 variables.  
-  
-  
-**Variables**
-
-* Battery: The capacity of the vehicle's battery in kilowatt-hours (kWh).
-* Car_name: The model name of the electric vehicle.
-* Car_name_link: A direct link to the corresponding page on EV Database for more in-depth information.
-* Efficiency: The energy efficiency rating of the vehicle in watt-hours per kilometer (Wh/km).
-* Fast_charge: The fast-charging capability of the vehicle in minutes for a certain charging percentage.
-* Price.DE.: The price of the electric vehicle in Germany.
-* Range: The driving range of the vehicle on a single charge in kilometers.
-* Top_speed: The maximum speed the vehicle can achieve in kilometers per hour.
-* Acceleration..0.100.: The acceleration time from 0 to 100 kilometers per hour.
-
-## Data Processing and Variables  
-<div style= "float:right;position: relative; top: 0px;">
-
-```{r, echo = FALSE, fig.dim = c(9, 7) }
-plot(ecars[,4:10],
-     main = 'Comparison of all Quantitive Features')
-
-```
-</div>
-1. I created a Make variable by extracting the first word from the Car_name variable. 
-2. I also renamed several columns to make them more intuitive for example I changed acceleration..0.100. to Acceleration.
-3. I removed the two cars that did not have fast charge capability (the Renault Twingo Electric and the e.Go e.wave X) because this was an important feature in the linear regression and was impacting their price. 
-4. I split the dataframe into two. A dataframe containing cars with prices called ecars (307 objects), and one containing cars missing prices called ecars_missing_price (51 objects). 
-
-After cleaning the data 45 unique car makes were included in the ecars data used to create the linear model and 22 unique car makes were included in the data with missing prices. Additionally 14 makes that have 10 or more car models are highlighted throughout the project.
-
-## Quantitative variables
-
-```{r, echo = FALSE}
-inputPanel(
-  varSelectInput("var", 
-                 tags$span(style="color: #343a40; font-size: 24px;","Feature"), 
-                 ecars[,4:10], 
-                 selected = "Price")
-  )
-
-column(4,
-plotlyOutput('p1', width = '500px', height = '550px')
-)
-
-column(4,
-plotlyOutput('p2', width = '500px', height = '550px')
-)
-
  
 column(4, 
-       plotOutput('histogram', width = '500px', height = '550px')
+       plotOutput('histogram', width = '420px', height = '500px')
 )
 
 ```
@@ -205,7 +215,7 @@ column(2,
                      selected = "Price")
         )
 column(8, 
-       plotOutput("scatter", height = '800px')
+       plotOutput("scatter", height = '600px')
         )
 column(2, 
             checkboxGroupInput("make", "Filter by Make",
@@ -235,11 +245,12 @@ output$scatter <- renderPlot({
   }, res = 100)
 
 ```
+
 ## Top Speed vs. Price
 
-Top speed is a fairly good predictor of price. 
+Top speed is the single best predictor of price among the quantitative variables with an R-squared value of 0.5771 and a p-value of 2.2e-16 for both coefficients. 
 
-```{r, figures-side, fig.show="hold", out.width="50%", echo = FALSE}
+```{r, echo = FALSE}
 
  output$makescatter <- renderPlotly({
 
@@ -269,33 +280,32 @@ ecars %>% group_by(Make) %>%
     ggtitle('Mean Price for each Make with 10+ Models')
 })
 
-column(8, plotlyOutput('makescatter', height = '650px'
-))
-column(4, plotOutput('barchart', height = '650px'
-))
+column(8, plotlyOutput('makescatter', width = '900px', height = '600px'))
+column(4, plotOutput('barchart', height = '600px'))
 
 ```
 
 ```{r}
-lm_Price_TS = lm(Price ~ Top_speed, ecars)
-summary(lm_Price_TS)
+#lm_Price_TS = lm(Price ~ Top_speed, ecars)
+#summary(lm_Price_TS)
 ```
 
-## Multiple linear regression 
-<div style= "float:right;position: relative; top: 0px;">
+## Multiple Linear Regression
 
+<div style= "float:right;position: relative; top: 0px;">
 ```{r, echo = FALSE}
 summary(model)
 ```
-
 </div>
-1. I started by making a linear model including all the continuous variables. 
-2. Using that model and an empty model I did an AIC which eliminated Battery. I expected either Battery or Range to be eliminated because of their co-linearity. 
-3. Price is skewed right so I did a BoxCox transformation and then redid the model after transforming the price.
+
+1.  I started by making a linear model including all the continuous variables.
+2.  Using that model and an empty model I did an AIC which eliminated Battery. I expected either Battery or Range to be eliminated because of their co-linearity.
+3.  Price is skewed right so I did a BoxCox transformation and then redid the model after transforming the price.
 
 ## Linear Model
-The predicted price of each car is plotted against the its actual price to easily visualize which vehicles cost more vs. less than predicted.
-                          
+
+The predicted price of each car is plotted against its actual price to easily visualize which vehicles cost more vs. less than predicted.
+
 The blue line indicates the predicted price for all vehicles in the data set. The black dashed lines indicate the confidence interval and the the red dashed lines indicate the prediction interval.
 
 ```{r, echo = FALSE}
@@ -303,7 +313,7 @@ column(2,
       sliderInput('xzoom', 'x zoom', 0, 300, 250, ticks = TRUE),
       sliderInput('yzoom', 'y zoom', 0, 300, 250, ticks = TRUE))
 column(10,
-      plotlyOutput('MLR', height = '650px'))
+      plotlyOutput('MLR', width = '1000px', height = '550px'))
 
 output$MLR <- renderPlotly({
     mlr = ggplot(NULL, aes(Predicted_price, Price)) +
@@ -322,7 +332,7 @@ output$MLR <- renderPlotly({
       ylim(25, input$yzoom) + xlim(25, input$xzoom) +
       labs(title = "Predicted Price vs. Price for all EV Models",
            caption = "Data source: ToothGrowth",
-           x = "Predicted price (euros in thousands)", y = "German Price (euros in thousands)",
+           x = "Predicted Price (euros in thousands)", y = "German Price (euros in thousands)",
            tag = "A")
     
     ggplotly(mlr, tooltip = c("x", 'y', "text")) 
@@ -330,7 +340,8 @@ output$MLR <- renderPlotly({
  
 ```
 
-## Price prediction using the linear model 
+## Price Prediction using the Linear Model
+
 ```{r, echo = FALSE}
 
   datasetInput <- reactive({  
@@ -389,7 +400,7 @@ output$pm <- renderPlot({
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Predict_upr), col = 'red', linetype = 'dashed', alpha = .8) +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_lwr), col = 'black', linetype = 'dashed', alpha = .8) +
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_upr), col = 'black', linetype = 'dashed', alpha = .8) +
-      geom_point(data = predicted_price, aes(x = Predicted, y = Price), alpha = .5) +
+      geom_point(data = predicted_price, aes(x = Predicted, y = Price), alpha = .7) +
       geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price), size = 4) +
       geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price, col = Make), size = 3) +
       geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price), size = 1) +
@@ -401,7 +412,10 @@ output$pm <- renderPlot({
       ylim(25, ymax) + xlim(25, xmax) +
       scale_color_manual(values = make_colors) +
       xlab("Predicted Price (euros in thousands)") + ylab("Price (euros in thousands)") +
-      ggtitle('Predicted Price vs. Price', subtitle = 'Means for Makes with 10+ Models Included')  
+      ggtitle('Predicted Price vs. Price', subtitle = 'Means for Makes with 10+ Models Included')+ 
+      theme(plot.title = element_text(size = 18), 
+            plot.subtitle = element_text(size = 14),
+            axis.title = element_text(size = 14))
     
 
     
@@ -441,4 +455,3 @@ column(2,
 column(8,
        plotOutput('pm', height = '650px'))
 ```
-
