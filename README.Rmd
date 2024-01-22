@@ -15,7 +15,11 @@ date: "2024-01-22"
 
 ### Overview
 
-This R Shiny app allows you to explore a
+This [R Shiny app](https://na-ta-lie.shinyapps.io/Electric_Vehicle_MLR_Price_Predictor/) allows you to explore and compare the features of 307 electric vehicles, and predict what the price of an electric car should be based on its features.
+
+You can also compare the predicted price of a vehicle to the mean price for car makes with 10+ models included inthe data set.
+
+**See how your car compares to others so you don't end up overpaying!**
 
 ### Data
 
@@ -39,9 +43,27 @@ This data required minimal processing. I created a Make variable by extracting t
 
 After cleaning the data 45 unique car makes were included in the ecars data used to create the linear model and 22 unique car makes were included in the data with missing prices. Additionally 14 makes that have 10 or more car models are highlighted throughout the project.
 
+For the multiple linear regression, I started by making a linear model including all the continuous variables
+
+Using that model and an empty model I did an AIC which eliminated Battery. I expected either Battery or Range to be eliminated because of their co-linearity
+
+Price did not have a normal distribution so I did a BoxCox transformation and then redid the model after transforming the price.
+
 ### Visuals
 
-![How to use the MLR.](MLR.png)
+**The images below show a preview of what you can do with this app**
+
+Hover over certain images to get more details. Check out the box plot for Porsche's acceleration below.\
+![](visuals/Hover.png)
+
+Look closely at variable relationships. You can examine the co-linear relationship between Battery and Range.\
+![](visuals/ST.png)
+
+See how an electric car's predicted price and actual price compare\
+![](visuals/LM.png)
+
+Input an electric cars features and predict what its price should be by following where the yellow diamond goes.\
+![](visuals/MLR.png)
 
 ### Links
 
