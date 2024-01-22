@@ -1,13 +1,23 @@
 2024-01-22
 
-## “Predict the Price of an Electric Car based on its Features”
+# “Predict the Price of an Electric Car based on its Features”
 
-### Usage
+## Table of Contents
+
+[Overview](https://github.com/Na-ta-lie/Is-your-electric-car-overpriced-/blob/main/README.md#Overview)  
+[Data](https://github.com/Na-ta-lie/Is-your-electric-car-overpriced-/blob/main/README.md#Data)  
+[Development](https://github.com/Na-ta-lie/Is-your-electric-car-overpriced-/blob/main/README.md#Development)  
+[Visuals](https://github.com/Na-ta-lie/Is-your-electric-car-overpriced-/blob/main/README.md#Visuals)  
+[Links](https://github.com/Na-ta-lie/Is-your-electric-car-overpriced-/blob/main/README.md#Links)
+
+### Overview
+
+This R Shiny app allows you to explore a
 
 ### Data
 
-This collection of data on electric vehicles came from
-[Kaggle](https://www.kaggle.com/datasets/fatihilhan/electric-vehicle-specifications-and-prices/).
+This collection of data on electric vehicles came from [Kaggle
+Dataset](https://www.kaggle.com/datasets/fatihilhan/electric-vehicle-specifications-and-prices/).
 The original set included 360 observations and 9 variables.
 
 **Variables**
@@ -29,7 +39,7 @@ The original set included 360 observations and 9 variables.
 - Acceleration..0.100.: The acceleration time from 0 to 100 kilometers
   per hour.
 
-### Developing the project
+### Development
 
 This data required minimal processing. I created a Make variable by
 extracting the first word from the Car_name variable. I also renamed
@@ -47,9 +57,12 @@ data used to create the linear model and 22 unique car makes were
 included in the data with missing prices. Additionally 14 makes that
 have 10 or more car models are highlighted throughout the project.
 
-### Thanks to:
+### Visuals
 
-- Rstudio
+<figure>
+<img src="MLR.png" alt="How to use the MLR." />
+<figcaption aria-hidden="true">How to use the MLR.</figcaption>
+</figure>
 
 ### Links
 
