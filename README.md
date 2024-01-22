@@ -82,18 +82,18 @@ transformation and then redid the model after transforming the price.
 
 Hover over certain images to get more details. Check out the box plot
 for Porsche’s acceleration below.  
-![](visuals/Hover.png)
+![](Visuals/Hover.png)
 
 Look closely at variable relationships. You can examine the co-linear
 relationship between Battery and Range.  
-![](visuals/ST.png)
+![](Visuals/ST.png)
 
 See how an electric car’s predicted price and actual price compare  
-![](visuals/LM.png)
+![](Visuals/LM.png)
 
 Input an electric cars features and predict what its price should be by
 following where the yellow diamond goes.  
-![](visuals/MLR.png)
+![](Visuals/MLR.png)
 
 ### Links
 
