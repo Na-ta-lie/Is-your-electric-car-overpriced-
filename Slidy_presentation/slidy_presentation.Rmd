@@ -130,7 +130,7 @@ plot(ecars[,4:10],
 </div>
 
 1.  I created a Make variable by extracting the first word from the Car_name variable.
-2.  I also renamed several columns to make them more intuitive for example I changed acceleration..0.100. to Acceleration.
+2.  I also renamed several columns to make them more intuitive. For example, I changed acceleration..0.100. to Acceleration.
 3.  I split the dataframe into two. A dataframe containing cars with prices called ecars (309 objects), and one containing cars missing prices called ecars_missing_price (51 objects).
 4.  I removed the two cars that did not have fast charge capability (the Renault Twingo Electric and the e.Go e.wave X) because this was an important feature in the linear regression and was impacting their price.
 
@@ -160,7 +160,7 @@ output$p1 <- renderPlotly({
    
   })
 column(4,
-plotlyOutput('p1', width = '420px', height = '500px')
+plotlyOutput('p1', width = '500px', height = '500px')
 )
 
   output$p2 <- renderPlotly({
@@ -177,12 +177,12 @@ plotlyOutput('p1', width = '420px', height = '500px')
               )%>% 
       layout(title = "Selected Feature (Makes with 10 + Models)",
              yaxis = list(title = ''),
-             xaxis = list(title = ''))
+             xaxis = list(title = '', range = c(0, 250000)))
     
   })
 
 column(4,
-plotlyOutput('p2', width = '420px', height = '500px')
+plotlyOutput('p2', width = '600px', height = '500px')
 )
   
  output$histogram <- renderPlot({
@@ -195,7 +195,7 @@ plotlyOutput('p2', width = '420px', height = '500px')
   })  
  
 column(4, 
-       plotOutput('histogram', width = '420px', height = '500px')
+       plotOutput('histogram', width = '500px', height = '500px')
 )
 
 ```
