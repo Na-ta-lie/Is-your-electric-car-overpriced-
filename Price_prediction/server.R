@@ -141,7 +141,7 @@ server <- function(input, output, session) {
       ylim(25, input$yzoom) + xlim(25, input$xzoom) +
       labs(title = "Predicted Price vs. Price for all EV Models",
            caption = "Data source: ToothGrowth",
-           x = "Predicted price (euros in thousands)", y = "German Price (euros in thousands)",
+           x = "Predicted Price (euros in thousands)", y = "German Price (euros in thousands)",
            tag = "A")
     
     ggplotly(mlr, tooltip = c("x", 'y', "text")) 
@@ -212,7 +212,7 @@ server <- function(input, output, session) {
       geom_point(data = df2, aes(x = x1/1000, y = y1/1000), size = 3, pch= 18, col = 'black') +
       theme(legend.position = "bottom", legend.text = element_text(size = 10))+
       ylim(25, ymax) + xlim(25, xmax) +
-      xlab("Predicted price (euros in thousands)") + ylab("Price (euros in thousands)") +
+      xlab("Predicted Price (euros in thousands)") + ylab("Price (euros in thousands)") +
       ggtitle('Predicted Price vs. Price for all EV Models')  
     
     
