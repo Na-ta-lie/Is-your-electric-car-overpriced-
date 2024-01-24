@@ -5,7 +5,7 @@ account: na-ta-lie
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 10942378
-bundleId: 8177186
+bundleId: 8180276
 url: https://na-ta-lie.shinyapps.io/Electric_Vehicle_Slidy_Presentation/
 version: 1
 asMultiple: FALSE

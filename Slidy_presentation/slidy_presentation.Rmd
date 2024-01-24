@@ -121,16 +121,11 @@ This collection of data on electric vehicles came from [Kaggle](https://www.kagg
 
 ## Data Processing and Variables
 
-<div style= "float:right;position: relative; top: 0px;">
-```{r, echo = FALSE, fig.dim = c(8, 6)}
- 
-output$features <- renderPlot({
-    plot(ecars[,4:10], 
+<div style= "float:right;position: relative; top: -20px;">
+```{r, echo = FALSE, fig.dim = c(7, 6)}
+ plot(ecars[,4:10], 
          main = 'Comparison of all Continuous Variables', 
-         cex =1.5)  
-  })
-
-plotOutput("features", height = '650px', width = '800px')
+         cex.main = 1.5, cex.axis = 1.5, cex = .5)
 ```
 </div>
 
@@ -241,7 +236,7 @@ output$scatter <- renderPlot({
       scale_color_manual(values = make_colors) +
       list(theme(legend.position = "bottom"),
       if (input$by_make) aes(color = Make),
-      geom_point(), 
+      geom_point(size = 2), 
       if (input$smooth) geom_smooth()
     )
     
