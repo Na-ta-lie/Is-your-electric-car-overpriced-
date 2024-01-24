@@ -33,21 +33,21 @@ fluidPage(theme = shinytheme('darkly'),
           uiOutput('tab1')
             ),
         fluidRow(
-          column(5,
-            h4("The original data set included 360 observation and 9 varibles.
+          column(4,
+            h3("The original data set included 360 observation and 9 varibles.
                51 models that did not include prices and two models that did not have fast charge were filtered out.
                Makes with 10 or more models are highlighted in the visuals."),
-            h4('The continuous variables included in the dataset are the following:'),
-            h5("Battery: The capacity of the vehicle's battery in kilowatt-hours (kWh)"),
-            h5("Efficiency: The energy efficiency rating of the vehicle in watt-hours per kilometer (Wh/km)."),
-            h5("Fast_charge: The fast-charging capability of the vehicle in minutes for a certain charging percentage."),
-            h5("Price: The price of the electric vehicle in Germany in euros."),
-            h5("Range: The driving range of the vehicle on a single charge in kilometers."),
-            h5("Top_speed: The maximum speed the vehicle can achieve in kilometers per hour."),
-            h5("Acceleration: The acceleration time(s) from 0 to 100 kilometers per hour.")
+            h3('The continuous variables included in the dataset are the following:'),
+            h4("Battery: The capacity of the vehicle's battery in kilowatt-hours (kWh)"),
+            h4("Efficiency: The energy efficiency rating of the vehicle in watt-hours per kilometer (Wh/km)."),
+            h4("Fast_charge: The fast-charging capability of the vehicle in range per hour of fast charging."),
+            h4("Price: The price of the electric vehicle in Germany in euros."),
+            h4("Range: The driving range of the vehicle on a single charge in kilometers."),
+            h4("Top_speed: The maximum speed the vehicle can achieve in kilometers per hour."),
+            h4("Acceleration: The acceleration time(s) from 0 to 100 kilometers per hour.")
                  ),
-          column(7,
-           plotOutput("features")
+          column(8,
+           plotOutput("features", height = '700px')
                  )
                 )           
              ),
@@ -100,10 +100,10 @@ fluidPage(theme = shinytheme('darkly'),
             ),
           column(8,
                  tags$label(h4('The visual below allows comparison of 
-                          the quantitative variables from the dataset. 
+                          the continuous variables from the dataset. 
                           Only data from car makes that have 10+ models is 
                           displayed.')),
-                 plotOutput("scatter")
+                 plotOutput("scatter", height = '650px')
                  ),
           column(2, 
             checkboxGroupInput("make", "Filter by Make",
@@ -119,7 +119,7 @@ fluidPage(theme = shinytheme('darkly'),
     navbarMenu("Linear Model",
       tabPanel("About the Linear Model",
           fluidRow(
-            tags$label(h3('The inputs of this multiple linear regression are all the quantititive varaibles from
+            tags$label(h3('The inputs of this multiple linear regression are all the continuous varaibles from
                           the data set except Battery, which was eliminated using an AIC. The output is Price. Price was 
                           transformed using a BoxCox transformation. I used the linear model to predict the prices of 
                           the vehicles in the data set. I then plotted the predicted price against the actual
@@ -135,7 +135,7 @@ fluidPage(theme = shinytheme('darkly'),
                  sliderInput('xzoom', 'x zoom', 0, 300, 250, ticks = TRUE),
                  sliderInput('yzoom', 'y zoom', 0, 300, 250, ticks = TRUE)),
           column(10,
-              plotlyOutput('MLR'))
+              plotlyOutput('MLR', height = '650px'))
                   )
                ),
       tabPanel('Price Predictor',
@@ -146,7 +146,7 @@ fluidPage(theme = shinytheme('darkly'),
                           label = "Efficiency (Wh/km)", 
                           value = 200),
             numericInput("fc", 
-                          label = "Fast Charge (minutes)", 
+                          label = "Fast Charge (km/hr)", 
                           value = 500),
             numericInput("range", 
                           label = "Range (km)", 

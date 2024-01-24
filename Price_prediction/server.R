@@ -24,7 +24,8 @@ server <- function(input, output, session) {
   
   output$features <- renderPlot({
     plot(ecars[,4:10], 
-         main = 'Comparison of all Quantitive Features')  
+         main = 'Comparison of all Continuous Variables', 
+         cex.lab=1.5, cex.axis=1.5, cex =1.5)  
   })
   
   
@@ -114,7 +115,7 @@ server <- function(input, output, session) {
       scale_color_manual(values = make_colors) +
       list(theme(legend.position = "bottom"),
       if (input$by_make) aes(color = Make),
-      geom_point(), 
+      geom_point(size = 2), 
       if (input$smooth) geom_smooth()
     )
     

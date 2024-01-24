@@ -1,7 +1,7 @@
 ---
 title: "Is Your Electric Vehicle Overpriced?"
 author: "Natalie Stier"
-date: "2024-01-08"
+date: "2024-01-26"
 output:
   slidy_presentation:
     css: bootstrap.min.css
@@ -113,7 +113,7 @@ This collection of data on electric vehicles came from [Kaggle](https://www.kagg
 -   Car_name: The model name of the electric vehicle.
 -   Car_name_link: A direct link to the corresponding page on EV Database for more in-depth information.
 -   Efficiency: The energy efficiency rating of the vehicle in watt-hours per kilometer (Wh/km).
--   Fast_charge: The fast-charging capability of the vehicle in minutes for a certain charging percentage.
+-   Fast_charge: The fast-charging capability of the vehicle in range per hour of fast charging..
 -   Price.DE.: The price of the electric vehicle in Germany.
 -   Range: The driving range of the vehicle on a single charge in kilometers.
 -   Top_speed: The maximum speed the vehicle can achieve in kilometers per hour.
@@ -403,7 +403,6 @@ output$pm <- renderPlot({
       geom_point(data = predicted_price, aes(x = Predicted, y = Price), alpha = .7) +
       geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price), size = 4) +
       geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price, col = Make), size = 3) +
-      geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price), size = 1) +
       geom_point(data = df2, aes(x = x1/1000, y = y1/1000), size = 7, pch= 18, col = 'black') +
       geom_point(data = df2, aes(x = x1/1000, y = y1/1000), size = 6, pch= 18, col = 'yellow') +
       geom_point(data = df2, aes(x = x1/1000, y = y1/1000), size = 3, pch= 18, col = 'black') +
@@ -426,7 +425,7 @@ column(2,
                           label = "Efficiency (Wh/km)", 
                           value = 200),
             numericInput("fc", 
-                          label = "Fast Charge (minutes)", 
+                          label = "Fast Charge (km/hr)", 
                           value = 500),
             numericInput("range", 
                           label = "Range (km)", 
@@ -460,15 +459,15 @@ column(8,
 
 Conclusions:  
 
-- Mercedes, BMWs, and, in particular, Porsches are priced higher than predicted.
+- Mercedes, BMW, and, in particular, Porsche, are priced higher than predicted.
 
-- Fiats are a very good value based on their price and features. 
+- Fiat models are a very good value based on their price and features. 
 
 - Teslas are priced slightly below their predicted value. 
 
-- Lotus Eletre is priced about 85,000 less than predicted. 
+- Both the Lotus Eletre models are priced about 85,000 euros less than predicted. 
 
-- Both the Lucid Air Dream Editions are priced almost 60,000 more than predicted
+- The Lucid Air Dream Editions P & R are priced almost 60,000 euros more than predicted
 
 Future Work:
 
