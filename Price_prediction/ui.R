@@ -103,7 +103,7 @@ fluidPage(theme = shinytheme('darkly'),
                           the continuous variables from the dataset. 
                           Only data from car makes that have 10+ models is 
                           displayed.')),
-                 plotOutput("scatter", height = '650px')
+                 plotOutput("scatter", height = '550px')
                  ),
           column(2, 
             checkboxGroupInput("make", "Filter by Make",
@@ -135,7 +135,7 @@ fluidPage(theme = shinytheme('darkly'),
                  sliderInput('xzoom', 'x zoom', 0, 300, 250, ticks = TRUE),
                  sliderInput('yzoom', 'y zoom', 0, 300, 250, ticks = TRUE)),
           column(10,
-              plotlyOutput('MLR', height = '650px'))
+              plotlyOutput('MLR', height = '550px'))
                   )
                ),
       tabPanel('Price Predictor',

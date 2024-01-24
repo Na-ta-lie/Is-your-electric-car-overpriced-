@@ -5,7 +5,7 @@ account: na-ta-lie
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 10883392
-bundleId: 8180139
+bundleId: 8180311
 url: https://na-ta-lie.shinyapps.io/Electric_Vehicle_MLR_Price_Predictor/
 version: 1
 asMultiple: FALSE
