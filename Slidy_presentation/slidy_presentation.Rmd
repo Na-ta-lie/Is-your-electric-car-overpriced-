@@ -124,7 +124,7 @@ This collection of data on electric vehicles came from [Kaggle](https://www.kagg
 <div style= "float:right;position: relative; top: 0px;">
 ```{r, echo = FALSE, fig.dim = c(8, 6)}
 plot(ecars[,4:10],
-     main = 'Comparison of all Quantitive Features')
+     main = 'Comparison of all Continuous Variables')
 
 ```
 </div>
@@ -177,7 +177,7 @@ plotlyOutput('p1', width = '500px', height = '500px')
               )%>% 
       layout(title = "Selected Feature (Makes with 10 + Models)",
              yaxis = list(title = ''),
-             xaxis = list(title = '', range = c(0, 250000)))
+             xaxis = list(title = ''))
     
   })
 
@@ -259,7 +259,7 @@ test = ggplot(ecars, aes(x = Top_speed, y = Price, text = Car_name)) +
   scale_color_manual(name = "Make", values = make_colors2, labels = make_other)+
   xlab("Top Speed (km/hr)") + 
   ylab("Price in Germany (euros) ") +
-  ggtitle('Electric Vehicle Battery vs. Price (Makes with 10+ Models Highlighted)') +
+  ggtitle('Top Speed vs. Price (Makes with 10+ Models Highlighted)') +
   theme(legend.position = "none")
 ggplotly(test, tooltip = c("x", 'y', "text")) 
  })
@@ -455,3 +455,22 @@ column(2,
 column(8,
        plotOutput('pm', height = '650px'))
 ```
+
+## Conclusions and Future Work 
+
+Conclusions:  
+
+- Mercedes, BMWs, and, in particular, Porsches are priced higher than predicted.
+
+- Fiats are a very good value based on their price and features. 
+
+- Teslas are priced slightly below their predicted value. 
+
+- Lotus Eletre is priced about 85,000 less than predicted. 
+
+- Both the Lucid Air Dream Editions are priced almost 60,000 more than predicted
+
+Future Work:
+
+It would be interesting to include other features in the linear model. For example, the Make of the car likely makes a significant difference in the price. People are likely to pay more money for the name BMW than Fiat. 
+
