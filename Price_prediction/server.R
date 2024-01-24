@@ -246,7 +246,6 @@ server <- function(input, output, session) {
       geom_smooth(data = predicted_price, aes(x = Predicted, y = Confidence_upr), col = 'black', linetype = 'dashed', alpha = .8) +
       geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price), size = 4) +
       geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price, col = Make), size = 3) +
-      geom_point(data = most_makes, aes(x = mean_predicted, y = mean_price), size = 1) +
       geom_point(data = df2, aes(x = x1/1000, y = y1/1000), size = 7, pch= 18, col = 'black') +
       geom_point(data = df2, aes(x = x1/1000, y = y1/1000), size = 6, pch= 18, col = 'yellow') +
       geom_point(data = df2, aes(x = x1/1000, y = y1/1000), size = 3, pch= 18, col = 'black') +

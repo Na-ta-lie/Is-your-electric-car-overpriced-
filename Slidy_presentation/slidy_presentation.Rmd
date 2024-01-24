@@ -123,9 +123,14 @@ This collection of data on electric vehicles came from [Kaggle](https://www.kagg
 
 <div style= "float:right;position: relative; top: 0px;">
 ```{r, echo = FALSE, fig.dim = c(8, 6)}
-plot(ecars[,4:10],
-     main = 'Comparison of all Continuous Variables')
+ 
+output$features <- renderPlot({
+    plot(ecars[,4:10], 
+         main = 'Comparison of all Continuous Variables', 
+         cex =1.5)  
+  })
 
+plotOutput("features", height = '650px', width = '800px')
 ```
 </div>
 
@@ -457,13 +462,24 @@ column(8,
 
 ## Conclusions and Future Work 
 
+<div style= "float:right;position: relative; top: 0px;">
+```{r, echo = FALSE}
+MM = most_makes
+MM = mutate(MM, Difference = (mean_price - mean_predicted))
+MM = rename(MM, Mean.Price = mean_price, Mean.Predicted = mean_predicted)
+MM
+```
+</div>
+
 Conclusions:  
 
-- Mercedes, BMW, and, in particular, Porsche, are priced higher than predicted.
+- Mercedes, BMW, and, in particular, Porsche models, are priced higher than predicted.
 
-- Fiat models are a very good value based on their price and features. 
+- MG models are a good value based on their price and features.  
 
-- Teslas are priced slightly below their predicted value. 
+- Audi, Volkswagen, Citroen, Peugeot, and Volvo models are priced very close to tge predicted price. 
+
+- Tesla models are priced slightly below their predicted value. 
 
 - Both the Lotus Eletre models are priced about 85,000 euros less than predicted. 
 
@@ -471,5 +487,5 @@ Conclusions:
 
 Future Work:
 
-It would be interesting to include other features in the linear model. For example, the Make of the car likely makes a significant difference in the price. People are likely to pay more money for the name BMW than Fiat. 
+- It would be interesting to include other features in the linear model. For example, the Make of the car likely makes a significant difference in the price.
 
