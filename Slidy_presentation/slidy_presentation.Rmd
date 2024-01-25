@@ -136,7 +136,7 @@ This collection of data on electric vehicles came from [Kaggle](https://www.kagg
 
 307 electric cars with 45 unique car makes were included in the ecars data used to create the linear model. Additionally 14 makes that have 10 or more car models are highlighted throughout the project.
 
-## Quantitative Variables
+## Explore the Continuous Variables
 
 ```{r, echo = FALSE}
 inputPanel(
@@ -160,7 +160,7 @@ output$p1 <- renderPlotly({
    
   })
 column(4,
-plotlyOutput('p1', width = '500px', height = '500px')
+plotlyOutput('p1', width = '400px', height = '500px')
 )
 
   output$p2 <- renderPlotly({
@@ -181,26 +181,26 @@ plotlyOutput('p1', width = '500px', height = '500px')
     
   })
 
-column(4,
-plotlyOutput('p2', width = '600px', height = '500px')
+column(5,
+plotlyOutput('p2', width = '480px', height = '500px')
 )
   
  output$histogram <- renderPlot({
     ggplot(ecars, aes(x=!!input$var)) + 
-      geom_histogram(color="black", fill="white", bins = 15)+
+      geom_histogram(color="black", fill="white", bins = 10)+
       ggtitle('Distribution of Selected Feature')+ 
       theme(plot.title = element_text(size=18, family= "Verdana"),
-            axis.title = element_text(size = 14))  
+            axis.title = element_text(size = 14))   
             
   })  
  
-column(4, 
-       plotOutput('histogram', width = '500px', height = '500px')
+column(3, 
+       plotOutput('histogram', width = '350px', height = '500px')
 )
 
 ```
 
-## Quantitative Variable Relationships
+## Continuous Variable Relationships
 
 ```{r, echo = FALSE}
 column(2, 
@@ -472,13 +472,13 @@ Conclusions:
 
 - MG models are a good value based on their price and features.  
 
-- Audi, Volkswagen, Citroen, Peugeot, and Volvo models are priced very close to tge predicted price. 
+- Audi, Volkswagen, Citroen, Peugeot, and Volvo models are priced very close to their predicted value. 
 
 - Tesla models are priced slightly below their predicted value. 
 
 - Both the Lotus Eletre models are priced about 85,000 euros less than predicted. 
 
-- The Lucid Air Dream Editions P & R are priced almost 60,000 euros more than predicted
+- Both the Lucid Air Dream Editions are priced almost 60,000 euros more than predicted
 
 Future Work:
 
